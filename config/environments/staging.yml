@@ -1,0 +1,133 @@
+# Configuração para ambiente de staging
+environment: staging
+
+# Configurações do servidor
+server:
+  port: ${PORT:-8000}
+  host: 0.0.0.0
+  cors:
+    enabled: true
+    origins: 
+      - ${FRONTEND_URL}
+      - http://localhost:3000
+
+# Configurações do banco de dados
+database:
+  host: ${DB_HOST}
+  port: ${DB_PORT:-5432}
+  name: ${DB_NAME}
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+  pool:
+    min: 2
+    max: 10
+    idle_timeout: 30000
+  ssl: true
+  ssl_reject_unauthorized: false
+
+# Configurações do Redis
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT:-6379}
+  database: ${REDIS_DB:-0}
+  password: ${REDIS_PASSWORD}
+  connection_timeout: 5000
+  command_timeout: 5000
+
+# Configurações JWT
+jwt:
+  secret: ${JWT_SECRET}
+  refresh_secret: ${JWT_REFRESH_SECRET}
+  expires_in: ${JWT_EXPIRES_IN:-1h}
+  refresh_expires_in: ${JWT_REFRESH_EXPIRES_IN:-7d}
+  algorithm: HS256
+
+# Configurações da Binance
+binance:
+  use_testnet: ${BINANCE_USE_TESTNET:-true}
+  base_url: ${BINANCE_BASE_URL:-https://api.binance.com}
+  testnet_url: ${BINANCE_TESTNET_URL:-https://testnet.binance.vision}
+  websocket_url: ${BINANCE_WEBSOCKET_URL:-wss://stream.binance.com:9443/ws}
+  testnet_websocket_url: ${BINANCE_TESTNET_WEBSOCKET_URL:-wss://testnet.binance.vision/ws}
+  rate_limits:
+    requests_per_minute: 1200
+    orders_per_second: 10
+    orders_per_day: 200000
+
+# Configurações de logging
+logging:
+  level: ${LOG_LEVEL:-debug}
+  format: json
+  file: ${LOG_FILE:-logs/aura-staging.log}
+  max_size: ${LOG_MAX_SIZE:-100MB}
+  max_files: ${LOG_MAX_FILES:-5}
+  console: true
+
+# Configurações de segurança
+security:
+  encryption_key: ${ENCRYPTION_KEY}
+  rate_limit:
+    window_ms: ${RATE_LIMIT_WINDOW_MS:-900000}
+    max_requests: ${RATE_LIMIT_MAX_REQUESTS:-200}
+  session_timeout: ${SESSION_TIMEOUT:-3600000}
+
+# Configurações de email
+email:
+  enabled: ${EMAIL_ENABLED:-false}
+  smtp:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT:-587}
+    secure: ${SMTP_SECURE:-false}
+    auth:
+      user: ${SMTP_USER}
+      password: ${SMTP_PASSWORD}
+  from: ${FROM_EMAIL:-noreply-staging@aura-trading.com}
+  templates_path: templates/emails
+
+# Configurações de notificações
+notifications:
+  slack:
+    enabled: ${SLACK_ENABLED:-true}
+    webhook_url: ${SLACK_WEBHOOK_URL}
+    channel: ${SLACK_CHANNEL:-#staging-alerts}
+    username: ${SLACK_USERNAME:-AURA Staging Bot}
+  
+  webhook:
+    enabled: ${WEBHOOK_ENABLED:-false}
+    url: ${WEBHOOK_URL}
+    timeout: ${WEBHOOK_TIMEOUT:-5000}
+
+# Configurações de monitoramento
+monitoring:
+  enabled: true
+  metrics:
+    enabled: true
+    interval: ${METRICS_INTERVAL:-30000}
+  health_checks:
+    enabled: true
+    interval: ${HEALTH_CHECK_INTERVAL:-60000}
+  alerts:
+    enabled: true
+
+# Configurações de cache
+cache:
+  ttl:
+    market_data: 5000
+    user_session: 3600000
+    strategy_state: 300000
+    portfolio_data: 30000
+
+# Configurações de performance
+performance:
+  max_concurrent_strategies: ${MAX_CONCURRENT_STRATEGIES:-100}
+  max_concurrent_backtests: ${MAX_CONCURRENT_BACKTESTS:-10}
+  market_data_buffer_size: ${MARKET_DATA_BUFFER_SIZE:-1000}
+  order_execution_timeout: ${ORDER_EXECUTION_TIMEOUT:-30000}
+
+# Configurações de staging
+staging:
+  debug_mode: true
+  mock_binance: false
+  seed_data: true
+  auto_migrate: true
+  reset_data_daily: false

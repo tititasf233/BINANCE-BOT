@@ -1,0 +1,133 @@
+# Configuração para ambiente de teste
+environment: test
+
+# Configurações do servidor
+server:
+  port: 8001
+  host: localhost
+  cors:
+    enabled: true
+    origins: 
+      - http://localhost:3000
+      - http://localhost:3001
+
+# Configurações do banco de dados
+database:
+  host: localhost
+  port: 5432
+  name: aura_trading_test
+  user: postgres
+  password: password
+  pool:
+    min: 1
+    max: 5
+    idle_timeout: 10000
+  ssl: false
+
+# Configurações do Redis
+redis:
+  host: localhost
+  port: 6379
+  database: 15  # Database separado para testes
+  password: null
+  connection_timeout: 2000
+  command_timeout: 2000
+
+# Configurações JWT
+jwt:
+  secret: test-secret-key-for-integration-tests
+  refresh_secret: test-refresh-secret-key
+  expires_in: 1h
+  refresh_expires_in: 7d
+  algorithm: HS256
+
+# Configurações da Binance
+binance:
+  use_testnet: true
+  base_url: http://localhost:3001  # Mock server
+  testnet_url: http://localhost:3001
+  websocket_url: ws://localhost:3001/ws
+  testnet_websocket_url: ws://localhost:3001/ws
+  rate_limits:
+    requests_per_minute: 10000  # Sem limite para testes
+    orders_per_second: 100
+    orders_per_day: 1000000
+
+# Configurações de logging
+logging:
+  level: error  # Reduzir logs durante testes
+  format: json
+  file: logs/aura-test.log
+  max_size: 10MB
+  max_files: 2
+  console: false
+
+# Configurações de segurança
+security:
+  encryption_key: test-32-character-encryption-key
+  rate_limit:
+    window_ms: 60000  # 1 minuto
+    max_requests: 1000  # Limite alto para testes
+  session_timeout: 3600000
+
+# Configurações de email
+email:
+  enabled: false
+  smtp:
+    host: localhost
+    port: 1025  # MailHog para testes
+    secure: false
+    auth:
+      user: ""
+      password: ""
+  from: test@aura-trading.com
+  templates_path: templates/emails
+
+# Configurações de notificações
+notifications:
+  slack:
+    enabled: false
+    webhook_url: ""
+    channel: "#test"
+    username: "AURA Test Bot"
+  
+  webhook:
+    enabled: false
+    url: ""
+    timeout: 1000
+
+# Configurações de monitoramento
+monitoring:
+  enabled: false
+  metrics:
+    enabled: false
+    interval: 60000
+  health_checks:
+    enabled: true
+    interval: 30000
+  alerts:
+    enabled: false
+
+# Configurações de cache
+cache:
+  ttl:
+    market_data: 1000     # TTL baixo para testes
+    user_session: 300000  # 5 minutos
+    strategy_state: 60000 # 1 minuto
+    portfolio_data: 5000  # 5 segundos
+
+# Configurações de performance
+performance:
+  max_concurrent_strategies: 50
+  max_concurrent_backtests: 10
+  market_data_buffer_size: 100
+  order_execution_timeout: 5000  # 5 segundos para testes
+
+# Configurações de teste
+test:
+  parallel_tests: false
+  cleanup_between_tests: true
+  mock_external_apis: true
+  fast_mode: true
+  timeout: 30000  # 30 segundos por teste
+  memory_limit: 256MB

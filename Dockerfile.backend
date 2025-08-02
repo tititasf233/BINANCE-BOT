@@ -1,0 +1,60 @@
+# Multi-stage build para o backend
+FROM node:18-alpine AS builder
+
+# Instalar dependências de build
+RUN apk add --no-cache python3 make g++
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY backend/package*.json ./
+
+# Instalar dependências
+RUN npm ci --only=production && npm cache clean --force
+
+# Copiar código fonte
+COPY backend/ ./
+
+# Build da aplicação
+RUN npm run build
+
+# Stage de produção
+FROM node:18-alpine AS production
+
+# Instalar dependências do sistema
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    && addgroup -g 1001 -S aura \
+    && adduser -S aura -u 1001
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar dependências do stage builder
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copiar aplicação buildada
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+
+# Copiar arquivos de configuração
+COPY config/ ./config/
+
+# Criar diretório de logs
+RUN mkdir -p /var/log/aura && chown -R aura:aura /var/log/aura
+
+# Mudar para usuário não-root
+USER aura
+
+# Expor porta
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+
+# Comando de inicialização
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "dist/index.js"]

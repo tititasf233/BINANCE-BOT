@@ -1,0 +1,209 @@
+groups:
+- name: aura-trading-alerts
+  rules:
+  # Application Health
+  - alert: AuraBackendDown
+    expr: up{job="aura-backend"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: backend
+    annotations:
+      summary: "AURA Backend is down"
+      description: "AURA Backend has been down for more than 1 minute"
+
+  - alert: AuraFrontendDown
+    expr: up{job="aura-frontend"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: frontend
+    annotations:
+      summary: "AURA Frontend is down"
+      description: "AURA Frontend has been down for more than 1 minute"
+
+  # Database Alerts
+  - alert: PostgreSQLDown
+    expr: up{job="postgres"} == 0
+    for: 30s
+    labels:
+      severity: critical
+      service: database
+    annotations:
+      summary: "PostgreSQL is down"
+      description: "PostgreSQL database has been down for more than 30 seconds"
+
+  - alert: PostgreSQLTooManyConnections
+    expr: pg_stat_database_numbackends / pg_settings_max_connections * 100 > 80
+    for: 2m
+    labels:
+      severity: warning
+      service: database
+    annotations:
+      summary: "PostgreSQL has too many connections"
+      description: "PostgreSQL is using {{ $value }}% of available connections"
+
+  # Redis Alerts
+  - alert: RedisDown
+    expr: up{job="redis"} == 0
+    for: 30s
+    labels:
+      severity: critical
+      service: cache
+    annotations:
+      summary: "Redis is down"
+      description: "Redis cache has been down for more than 30 seconds"
+
+  - alert: RedisMemoryHigh
+    expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 90
+    for: 2m
+    labels:
+      severity: warning
+      service: cache
+    annotations:
+      summary: "Redis memory usage is high"
+      description: "Redis is using {{ $value }}% of available memory"
+
+  # System Resource Alerts
+  - alert: HighCPUUsage
+    expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+      service: system
+    annotations:
+      summary: "High CPU usage detected"
+      description: "CPU usage is above 80% for more than 5 minutes on {{ $labels.instance }}"
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+    for: 5m
+    labels:
+      severity: warning
+      service: system
+    annotations:
+      summary: "High memory usage detected"
+      description: "Memory usage is above 85% for more than 5 minutes on {{ $labels.instance }}"
+
+  - alert: DiskSpaceLow
+    expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+    for: 1m
+    labels:
+      severity: critical
+      service: system
+    annotations:
+      summary: "Disk space is running low"
+      description: "Disk space is below 10% on {{ $labels.instance }} ({{ $labels.mountpoint }})"
+
+  # Application-specific Alerts
+  - alert: HighErrorRate
+    expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) * 100 > 5
+    for: 2m
+    labels:
+      severity: warning
+      service: backend
+    annotations:
+      summary: "High error rate detected"
+      description: "Error rate is {{ $value }}% for the last 5 minutes"
+
+  - alert: HighResponseTime
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+    for: 3m
+    labels:
+      severity: warning
+      service: backend
+    annotations:
+      summary: "High response time detected"
+      description: "95th percentile response time is {{ $value }}s for the last 5 minutes"
+
+  - alert: TradingEngineDown
+    expr: aura_trading_engine_active == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: trading
+    annotations:
+      summary: "Trading engine is not active"
+      description: "Trading engine has been inactive for more than 1 minute"
+
+  - alert: BinanceAPIErrors
+    expr: rate(aura_binance_api_errors_total[5m]) > 0.1
+    for: 2m
+    labels:
+      severity: warning
+      service: trading
+    annotations:
+      summary: "High Binance API error rate"
+      description: "Binance API error rate is {{ $value }} errors/second"
+
+  - alert: StrategyExecutionFailures
+    expr: rate(aura_strategy_execution_failures_total[5m]) > 0.05
+    for: 3m
+    labels:
+      severity: warning
+      service: trading
+    annotations:
+      summary: "High strategy execution failure rate"
+      description: "Strategy execution failure rate is {{ $value }} failures/second"
+
+  # Business Logic Alerts
+  - alert: NoActiveStrategies
+    expr: aura_active_strategies_count == 0
+    for: 5m
+    labels:
+      severity: warning
+      service: trading
+    annotations:
+      summary: "No active trading strategies"
+      description: "No trading strategies have been active for more than 5 minutes"
+
+  - alert: UnusualTradingVolume
+    expr: rate(aura_trades_total[1h]) > 100 or rate(aura_trades_total[1h]) < 1
+    for: 10m
+    labels:
+      severity: info
+      service: trading
+    annotations:
+      summary: "Unusual trading volume detected"
+      description: "Trading volume is {{ $value }} trades/hour, which is outside normal range"
+
+  - alert: LargeLoss
+    expr: aura_portfolio_pnl_total < -1000
+    for: 1m
+    labels:
+      severity: critical
+      service: trading
+    annotations:
+      summary: "Large portfolio loss detected"
+      description: "Portfolio P&L is {{ $value }} USD, indicating significant losses"
+
+  # Kubernetes-specific Alerts
+  - alert: PodCrashLooping
+    expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+    for: 5m
+    labels:
+      severity: warning
+      service: kubernetes
+    annotations:
+      summary: "Pod is crash looping"
+      description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping"
+
+  - alert: PodNotReady
+    expr: kube_pod_status_ready{condition="false"} == 1
+    for: 5m
+    labels:
+      severity: warning
+      service: kubernetes
+    annotations:
+      summary: "Pod is not ready"
+      description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been not ready for more than 5 minutes"
+
+  - alert: DeploymentReplicasMismatch
+    expr: kube_deployment_spec_replicas != kube_deployment_status_available_replicas
+    for: 5m
+    labels:
+      severity: warning
+      service: kubernetes
+    annotations:
+      summary: "Deployment replicas mismatch"
+      description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} has {{ $labels.spec_replicas }} desired but {{ $labels.available_replicas }} available replicas"

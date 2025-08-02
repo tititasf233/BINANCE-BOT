@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aura-config
+  namespace: aura-trading
+  labels:
+    app: aura
+data:
+  NODE_ENV: "production"
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "aura_trading"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  LOG_LEVEL: "info"
+  BINANCE_USE_TESTNET: "false"
+  BINANCE_BASE_URL: "https://api.binance.com"
+  BINANCE_TESTNET_URL: "https://testnet.binance.vision"
+  JWT_EXPIRES_IN: "1h"
+  JWT_REFRESH_EXPIRES_IN: "7d"
+  JWT_ALGORITHM: "RS256"
+  RATE_LIMIT_WINDOW_MS: "900000"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  SESSION_TIMEOUT: "3600000"
+  MAX_CONCURRENT_STRATEGIES: "500"
+  MAX_CONCURRENT_BACKTESTS: "20"
+  MARKET_DATA_BUFFER_SIZE: "5000"
+  ORDER_EXECUTION_TIMEOUT: "30000"
+  METRICS_INTERVAL: "30000"
+  HEALTH_CHECK_INTERVAL: "60000"
+  EMAIL_ENABLED: "true"
+  SLACK_ENABLED: "true"
+  WEBHOOK_ENABLED: "false"
+  SENTRY_ENABLED: "false"
+  DATADOG_ENABLED: "false"

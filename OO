@@ -1,0 +1,278 @@
+Documento de Design Técnico: Sistema de Trading Algorítmico "AURA"
+Versão: 1.0
+Autor: Gemini (Engenharia de IA)
+Objetivo: Este documento serve como a especificação técnica fundamental para o desenvolvimento do sistema "AURA" (Automated Unified Risk-managed Arbitrage). Ele detalha a arquitetura, componentes, modelos de dados, contratos de API e fluxos operacionais para um bot de trading de criptomoedas de alta performance, utilizando a API da Binance.
+
+1.0 Visão Geral e Filosofia de Design
+AURA não será apenas um bot, mas uma plataforma robusta para automação de estratégias de trading. A filosofia central é baseada em:
+
+Modularidade e Extensibilidade: Cada componente (ingestão de dados, motor de estratégia, execução) é desacoplado, permitindo futuras expansões (ex: para outras exchanges, tipos de mercado como Futuros, ou estratégias de Machine Learning).
+
+Resiliência e Tolerância a Falhas: O sistema deve ser capaz de se recuperar de falhas de rede, erros de API e reinicializações inesperadas sem deixar posições órfãs ou entrar em estado inconsistente.
+
+Segurança como Prioridade Zero: Proteção rigorosa de chaves de API e dados do usuário em todas as camadas da aplicação.
+
+Performance em Tempo Real: A arquitetura deve privilegiar baixa latência na resposta a eventos de mercado.
+
+2.0 Requisitos
+2.1 Requisitos Funcionais (RF)
+(RF-01) O sistema deve permitir ao usuário cadastrar e gerenciar de forma segura suas chaves de API da Binance.
+
+(RF-02) O sistema deve ingerir e processar dados de mercado em tempo real (preços, klines) e dados históricos da Binance.
+
+(RF-03) O usuário deve poder criar estratégias de trading customizadas baseadas em uma combinação de indicadores técnicos (SMA, EMA, RSI, MACD, Bandas de Bollinger).
+
+(RF-04) O sistema deve permitir o backtesting de estratégias contra dados históricos, fornecendo um relatório detalhado de performance (P&L, Drawdown, Win Rate, etc.).
+
+(RF-05) O sistema deve executar as estratégias ativas, abrindo e fechando posições automaticamente.
+
+(RF-06) Toda ordem de entrada deve ser obrigatoriamente acompanhada por ordens OCO (One-Cancels-the-Other) para gestão de risco (Take Profit e Stop Loss).
+
+(RF-07) O sistema deve fornecer um dashboard em tempo real exibindo o valor do portfólio, P&L, posições abertas e logs de atividade.
+
+(RF-08) Todas as operações executadas devem ser registradas em um histórico detalhado e auditável.
+
+2.2 Requisitos Não-Funcionais (RNF)
+(RNF-01) Segurança: Chaves de API devem ser criptografadas em repouso (AES-256) e nunca expostas no frontend ou em logs. A comunicação Frontend-Backend deve ser via HTTPS.
+
+(RNF-02) Performance: A latência entre o recebimento de um sinal de mercado (via Websocket) e o envio de uma ordem à Binance não deve exceder 500ms sob condições normais.
+
+(RNF-03) Confiabilidade: O sistema deve ter um uptime de 99.9%. Implementar mecanismos de health check e recuperação automática.
+
+(RNF-04) Escalabilidade: O backend deve ser capaz de gerenciar centenas de estratégias concorrentes em dezenas de pares de moedas simultaneamente.
+
+(RNF-05) Logging e Monitoramento: Implementar logging estruturado (JSON) para todas as ações críticas. Métricas de performance (latência, uso de CPU/memória) devem ser monitoradas.
+
+3.0 Arquitetura de Sistema Proposta
+Adotaremos uma arquitetura orientada a eventos para o backend, ideal para sistemas reativos de baixa latência.
+
+1. Frontend (SPA - Single Page Application): Interface do usuário desenvolvida em React/Vue. Comunica-se exclusivamente com a API Gateway do Backend.
+
+2. Backend:
+
+API Gateway: Ponto de entrada para todas as requisições do frontend. Responsável por autenticação, autorização e roteamento.
+
+Serviço de Ingestão de Dados (Data Ingestor): Módulo dedicado a manter conexões Websocket com a Binance. Publica eventos de mercado (ex: kline_closed, ticker_update) em um Message Broker. Ele também fornece dados históricos sob demanda.
+
+Message Broker (ex: RabbitMQ, Redis Pub/Sub): Desacopla os serviços. O Ingestor publica, e os Motores de Estratégia consomem.
+
+Serviço de Motor de Estratégia (Strategy Engine): Consome eventos do broker. Cada estratégia ativa roda em seu próprio processo ou thread, mantendo seu estado (indicadores, etc.). Ao detectar um sinal, publica um evento de "ação de trade" (ex: trade_signal_generated).
+
+Serviço de Execução (Execution Engine): Consome os eventos de trade_signal_generated. Responsável por toda a interação com a API de trading da Binance (criação de ordens, validação de regras, gestão de risco). É o único módulo com permissão para enviar ordens.
+
+Serviço de Contas e Persistência: Gerencia o estado da conta, balanços e persiste os dados de trades no banco de dados.
+
+3. Banco de Dados (PostgreSQL): Armazena dados relacionais: usuários, estratégias, histórico de trades, etc.
+
+4. Cache (Redis): Armazena dados voláteis e de acesso rápido, como o estado atual dos indicadores para cada estratégia ou preços em tempo real.
+
+4.0 Design Detalhado do Backend
+4.1 Serviço de Ingestão de Dados
+Lógica: Ao iniciar, busca na DB as estratégias ativas e os pares de moedas necessários. Abre uma conexão websocket para cada stream (<symbol>@kline_<interval>).
+
+Evento Publicado (kline_closed):
+
+JSON
+
+{
+  "event_time": "...",
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "kline": { "open_time": "...", "open": "...", "high": "...", ... }
+}
+4.2 Serviço de Motor de Estratégia
+Classe Abstrata BaseStrategy:
+
+Python
+
+class BaseStrategy:
+    def __init__(self, params): ...
+    def on_kline(self, kline_data): ... # Lógica principal
+    def calculate_indicators(self): ...
+    def check_entry_signal(self): ...
+    def check_exit_signal(self): ...
+Lógica de Execução: Para cada estratégia ativa, uma instância é criada. Ela subscreve ao tópico relevante no broker (ex: market.kline.btcusdt.1h). A cada kline_closed recebido, o método on_kline é chamado, que atualiza os indicadores e verifica por sinais de entrada/saída.
+
+Evento Publicado (trade_signal_generated):
+
+JSON
+
+{
+  "strategy_id": 123,
+  "symbol": "BTCUSDT",
+  "action": "ENTRY", // ou "EXIT"
+  "signal_price": "68500.00",
+  "risk_params": {
+      "order_type": "MARKET",
+      "position_size_usd": 100,
+      "take_profit_percent": 5.0,
+      "stop_loss_percent": 2.0
+  }
+}
+4.3 Serviço de Execução
+Fluxo de Entrada:
+
+Consome trade_signal_generated.
+
+Lock de Segurança: Adquire um lock para o par de moeda para evitar ordens concorrentes.
+
+Validação Dupla: Consulta o saldo da conta (/api/v3/account) e as regras do par (/api/v3/exchangeInfo). Aborta se o saldo for insuficiente ou a ordem violar as regras.
+
+Cria Ordem de Entrada: Envia POST /api/v3/order (ex: MARKET buy).
+
+Aguarda Confirmação: Espera a confirmação da execução da ordem de entrada.
+
+Cria Ordem OCO: Imediatamente, calcula os preços de TP/SL e envia POST /api/v3/order/oco.
+
+Persistência: Salva o trade completo (entrada, TP, SL, IDs das ordens) no banco de dados.
+
+Libera o lock.
+
+Tratamento de Falha Crítica: Se o bot falhar entre os passos 4 e 6 (posição órfã), na reinicialização, o Serviço de Execução deve rodar um procedimento de reconciliação: consultar todas as posições abertas na Binance (/api/v3/openOrders) e verificar se elas possuem um registro correspondente na DB. Se uma posição não tiver uma ordem OCO associada, uma é criada imediatamente ou a posição é fechada a mercado (configurável).
+
+5.0 Design Detalhado do Frontend (React + Redux Toolkit)
+5.1 Estrutura de Componentes
+DashboardPage:
+
+PortfolioOverviewChart (Gráfico de Pizza)
+
+PerformanceChart (Gráfico de Linha de P&L)
+
+ActivePositionsTable (Tabela de Posições)
+
+LiveLogFeed (Log de Atividades)
+
+StrategiesPage:
+
+StrategyList (Lista de estratégias criadas)
+
+StrategyEditor (Componente principal)
+
+ConditionBuilder (UI para adicionar/remover condições RSI < 30)
+
+IndicatorParamsForm (Inputs para parâmetros RSI(14))
+
+RiskManagementForm (Inputs para TP/SL, tamanho da posição)
+
+BacktestModule
+
+DateRangePicker
+
+BacktestResultModal (Exibe o relatório de backtest)
+
+HistoryPage:
+
+TradesDataTable (Tabela com filtros e paginação)
+
+5.2 Gerenciamento de Estado (Redux Store)
+userSlice: isAuthenticated, apiKeysStatus.
+
+portfolioSlice: balances, totalValue, dailyPnl. Atualizado via Websocket do nosso backend.
+
+strategiesSlice: strategiesList, selectedStrategy, editorState.
+
+marketDataSlice: livePrices, chartData.
+
+6.0 Esquema do Banco de Dados (PostgreSQL)
+SQL
+
+-- Tabela de Usuários (se houver autenticação no sistema)
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Chaves de API criptografadas dos usuários
+CREATE TABLE user_api_keys (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    binance_api_key VARCHAR(255) NOT NULL,
+    binance_secret_key_encrypted TEXT NOT NULL, -- Criptografado!
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- Definições das estratégias criadas pelos usuários
+CREATE TABLE strategies (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    name VARCHAR(100) NOT NULL,
+    symbol VARCHAR(20) NOT NULL,
+    "interval" VARCHAR(5) NOT NULL,
+    entry_conditions JSONB NOT NULL,
+    exit_conditions JSONB NOT NULL, -- Inclui TP/SL
+    risk_params JSONB NOT NULL, -- Tamanho da posição, etc.
+    is_active BOOLEAN DEFAULT FALSE
+);
+
+-- Registro de todos os trades executados
+CREATE TABLE trades (
+    id SERIAL PRIMARY KEY,
+    strategy_id INTEGER REFERENCES strategies(id),
+    binance_order_id_entry BIGINT UNIQUE NOT NULL,
+    binance_order_id_oco BIGINT,
+    symbol VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL, -- OPEN, CLOSED_TP, CLOSED_SL, CLOSED_MANUAL
+    entry_price DECIMAL(20, 10) NOT NULL,
+    exit_price DECIMAL(20, 10),
+    quantity DECIMAL(20, 10) NOT NULL,
+    entry_timestamp TIMESTAMPTZ NOT NULL,
+    exit_timestamp TIMESTAMPTZ,
+    pnl DECIMAL(20, 10)
+);
+
+-- Logs de atividade do sistema
+CREATE TABLE system_logs (
+    id BIGSERIAL PRIMARY KEY,
+    "timestamp" TIMESTAMPTZ DEFAULT NOW(),
+    log_level VARCHAR(10), -- INFO, WARN, ERROR
+    service VARCHAR(50), -- ex: 'ExecutionEngine'
+    message TEXT,
+    metadata JSONB
+);
+7.0 Contrato da API Interna (Backend <-> Frontend)
+Autenticação: JWT (JSON Web Tokens) em todos os endpoints privados.
+
+Endpoints Críticos:
+
+POST /api/v1/strategies
+
+Payload: { name, symbol, interval, entry_conditions, exit_conditions, risk_params }
+
+Response: 201 (Created) com o objeto da estratégia criada.
+
+POST /api/v1/strategies/{id}/activate
+
+Response: 200 (OK) { status: 'activating' }
+
+POST /api/v1/strategies/{id}/backtest
+
+Payload: { start_date, end_date }
+
+Response: 200 (OK) com o relatório completo do backtest em JSON.
+
+GET /api/v1/portfolio/overview
+
+Response: 200 (OK) { total_value_usd, balances: [...], pnl: {...} }
+
+GET /api/v1/trades?status=OPEN
+
+Response: 200 (OK) [ { trade_details_1 }, { trade_details_2 } ]
+
+Websocket (Backend -> Frontend):
+
+O frontend estabelecerá uma conexão Websocket autenticada com o Backend.
+
+Tópicos: portfolio_update, new_trade, log_message.
+
+8.0 Considerações de Deployment (DevOps)
+Containerização: Todos os serviços do backend serão containerizados com Docker.
+
+Orquestração: Kubernetes (ou Docker Compose para ambientes mais simples) para gerenciar os containers.
+
+CI/CD: Pipeline de Integração e Entrega Contínua (ex: GitHub Actions) para automatizar testes, build e deploy.
+
+Gerenciamento de Segredos: Utilizar um sistema de vault (ex: HashiCorp Vault, AWS Secrets Manager) para injetar as chaves de criptografia e outros segredos em tempo de execução.
+
+Este documento fornece um alicerce detalhado e profissional. Uma equipe de desenvolvimento pode usar as seções de Esquema do Banco de Dados e Contrato da API para trabalhar em paralelo no backend e frontend, enquanto a Arquitetura de Sistema guia as decisões de infraestrutura e lógica de negócios.
