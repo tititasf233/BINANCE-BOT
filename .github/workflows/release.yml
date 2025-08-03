@@ -1,0 +1,187 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  REGISTRY: ghcr.io
+  DOCKER_HUB_REGISTRY: docker.io
+
+jobs:
+  # Job de build e release das imagens Docker
+  release:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - service: backend
+            dockerfile: ./Dockerfile.backend
+            context: .
+          - service: frontend
+            dockerfile: ./Dockerfile.frontend
+            context: .
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Log in to Docker Hub
+      if: secrets.DOCKERHUB_USERNAME != ''
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Extract metadata for GitHub Registry
+      id: meta-ghcr
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.service }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=raw,value=stable
+
+    - name: Extract metadata for Docker Hub
+      if: secrets.DOCKERHUB_USERNAME != ''
+      id: meta-dockerhub
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ secrets.DOCKERHUB_USERNAME }}/aura-${{ matrix.service }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=raw,value=stable
+
+    - name: Build and push to GitHub Container Registry
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ matrix.context }}
+        file: ${{ matrix.dockerfile }}
+        push: true
+        tags: ${{ steps.meta-ghcr.outputs.tags }}
+        labels: ${{ steps.meta-ghcr.outputs.labels }}
+        platforms: linux/amd64,linux/arm64
+        cache-from: type=gha,scope=${{ matrix.service }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
+          VERSION=${{ steps.version.outputs.VERSION }}
+
+    - name: Build and push to Docker Hub
+      if: secrets.DOCKERHUB_USERNAME != ''
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ matrix.context }}
+        file: ${{ matrix.dockerfile }}
+        push: true
+        tags: ${{ steps.meta-dockerhub.outputs.tags }}
+        labels: ${{ steps.meta-dockerhub.outputs.labels }}
+        platforms: linux/amd64,linux/arm64
+        build-args: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+
+    - name: Generate release SBOM
+      uses: anchore/sbom-action@v0
+      with:
+        image: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.service }}:${{ steps.version.outputs.VERSION }}
+        format: spdx-json
+        output-file: ${{ matrix.service }}-${{ steps.version.outputs.VERSION }}-sbom.spdx.json
+
+    - name: Upload release SBOM
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.service }}-${{ steps.version.outputs.VERSION }}-sbom
+        path: ${{ matrix.service }}-${{ steps.version.outputs.VERSION }}-sbom.spdx.json
+
+  # Job para criar GitHub Release
+  create-release:
+    needs: release
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Get the previous tag
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+        
+        if [ -n "$PREVIOUS_TAG" ]; then
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          echo "## Changes since $PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "CHANGELOG=Initial release" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Download SBOMs
+      uses: actions/download-artifact@v4
+      with:
+        path: ./sboms
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ steps.version.outputs.VERSION }}
+        body: |
+          # AURA Trading System ${{ steps.version.outputs.VERSION }}
+          
+          ## Docker Images
+          
+          ### GitHub Container Registry
+          - Backend: `ghcr.io/${{ github.repository }}/backend:${{ steps.version.outputs.VERSION }}`
+          - Frontend: `ghcr.io/${{ github.repository }}/frontend:${{ steps.version.outputs.VERSION }}`
+          
+          ### Docker Hub (if configured)
+          - Backend: `${{ secrets.DOCKERHUB_USERNAME }}/aura-backend:${{ steps.version.outputs.VERSION }}`
+          - Frontend: `${{ secrets.DOCKERHUB_USERNAME }}/aura-frontend:${{ steps.version.outputs.VERSION }}`
+          
+          ## Changelog
+          ${{ steps.changelog.outputs.CHANGELOG }}
+          
+          ## Security
+          - All images are scanned for vulnerabilities
+          - SBOMs (Software Bill of Materials) are attached to this release
+          - Images are built with multi-stage builds for minimal attack surface
+        files: |
+          sboms/**/*.spdx.json
+        draft: false
+        prerelease: ${{ contains(github.ref_name, '-') }}

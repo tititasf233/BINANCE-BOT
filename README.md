@@ -161,19 +161,89 @@ npm run test:coverage
 - **Testes de Integração**: 50+ cenários
 - **Performance**: <500ms latência média
 
-## 🐳 Docker
+## 🐳 Docker & CI/CD
 
-### Desenvolvimento
+### 🚀 Imagens Docker Automáticas
+
+O sistema possui CI/CD totalmente automatizado com GitHub Actions:
+
+- **Build automático** em cada push
+- **Testes** executados antes do deploy
+- **Publicação** no GitHub Container Registry
+- **Deploy automático** para staging/produção
+
+#### Imagens Disponíveis
 
 ```bash
+# GitHub Container Registry (Recomendado)
+docker pull ghcr.io/[owner]/[repo]/backend:latest
+docker pull ghcr.io/[owner]/[repo]/frontend:latest
+
+# Tags disponíveis: latest, develop, v1.2.3, stable
+```
+
+### 🛠️ Desenvolvimento Local
+
+```bash
+# Usando Docker Compose
 docker-compose up -d
+
+# Ou usando helper script
+./scripts/docker-helper.sh build all
+./scripts/docker-helper.sh run backend
 ```
 
-### Produção
+### 🚀 Produção
 
 ```bash
+# Docker Compose para produção
 docker-compose -f docker-compose.prod.yml up -d
+
+# Ou usando imagens do registry
+docker run -d -p 3001:8000 ghcr.io/[owner]/[repo]/backend:latest
+docker run -d -p 3000:80 ghcr.io/[owner]/[repo]/frontend:latest
 ```
+
+### 📋 Scripts Helper
+
+Para facilitar o gerenciamento das imagens Docker:
+
+```bash
+# Linux/Mac
+./scripts/docker-helper.sh help
+
+# Windows
+scripts\docker-helper.bat help
+```
+
+**Comandos disponíveis:**
+- `build [service]` - Build local das imagens
+- `pull [tag]` - Pull das imagens do registry
+- `run [service]` - Executar serviço localmente
+- `logs [service]` - Mostrar logs
+- `clean` - Limpar imagens não utilizadas
+
+### 🔄 CI/CD Pipeline
+
+O pipeline automatizado inclui:
+
+1. **Testes** - Unitários, integração e linting
+2. **Build** - Imagens Docker multi-arquitetura
+3. **Security** - Scan de vulnerabilidades
+4. **Deploy** - Automático para staging/produção
+5. **Monitoring** - Health checks e notificações
+
+**Triggers:**
+- Push para `main` → Deploy produção
+- Push para `develop` → Deploy staging
+- Tags `v*.*.*` → Release com changelog
+
+### 📊 Registries Suportados
+
+- **GitHub Container Registry** (GHCR) - Automático
+- **Docker Hub** - Configuração opcional
+
+Para mais detalhes, veja [DOCKER_CICD.md](docs/DOCKER_CICD.md)
 
 ## ☸️ Kubernetes
 
