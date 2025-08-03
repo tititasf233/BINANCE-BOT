@@ -61,7 +61,7 @@ export class ErrorHandler {
     return processedError;
   }
 
-  public expressErrorHandler = (error: Error, req: Request, res: Response, next: NextFunction): void => {
+  public expressErrorHandler = (error: Error, req: Request, res: Response, _next: NextFunction): void => {
     const processedError = this.handleError(error, req);
 
     // Don't send error details in production for security

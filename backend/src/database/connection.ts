@@ -33,7 +33,7 @@ class DatabaseConnection {
   }
 
   private setupEventHandlers(): void {
-    this.pool.on('connect', (_client: PoolClient) => {
+    this.pool.on('connect', () => {
       logger.info('New database client connected');
     });
 

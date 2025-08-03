@@ -119,7 +119,7 @@ class DatabaseMigrator {
     }
   }
 
-  async rollback(_targetVersion?: string): Promise<void> {
+  async rollback(): Promise<void> {
     // This is a simplified rollback - in production you'd want more sophisticated rollback logic
     logger.warn('Rollback functionality not implemented yet');
     throw new Error('Rollback functionality not implemented');

@@ -386,7 +386,7 @@ export class ExecutionEngineService extends EventEmitter {
   private async exitPosition(
     tradingService: BinanceTradingService,
     trade: TradeFields,
-    _signal: SignalResult
+    signal: SignalResult
   ): Promise<ExecutionResult> {
     try {
       // Cancel existing OCO order if present
@@ -401,6 +401,8 @@ export class ExecutionEngineService extends EventEmitter {
 
       // Place market order to close position
       const exitSide = trade.side === 'BUY' ? 'SELL' : 'BUY';
+      logger.info(`Exiting position based on signal: ${signal.signal} with strength ${signal.strength}`);
+      
       const exitOrder = await tradingService.placeMarketOrder({
         symbol: trade.symbol,
         side: exitSide,

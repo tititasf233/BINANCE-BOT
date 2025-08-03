@@ -355,14 +355,14 @@ export class BacktestingService {
 
       // Check for stop loss / take profit if position is open
       if (openTrade) {
-        const currentPrice = parseFloat(kline.close);
+        // const currentPrice = parseFloat(kline.close); // Not used directly, but available for future use
         const entryPrice = openTrade.entryPrice;
         
         const takeProfitPrice = entryPrice * (1 + riskParams.takeProfitPercent / 100);
         const stopLossPrice = entryPrice * (1 - riskParams.stopLossPercent / 100);
 
         let shouldClose = false;
-        let closeStatus: 'CLOSED_TP' | 'CLOSED_SL' = 'CLOSED_MANUAL';
+        let closeStatus: 'CLOSED_TP' | 'CLOSED_SL' | 'CLOSED_MANUAL' = 'CLOSED_MANUAL';
 
         // Check if high reached take profit
         if (parseFloat(kline.high) >= takeProfitPrice) {

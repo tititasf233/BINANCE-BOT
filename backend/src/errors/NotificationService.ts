@@ -45,6 +45,7 @@ export class EmailNotificationChannel implements NotificationChannel {
         to: this.config.toEmails,
         subject: `[AURA] ${error.severity.toUpperCase()} Error: ${error.code}`,
         error: error.toJSON(),
+        content: emailContent, // Using the emailContent variable
       }, 'Sending error notification email');
 
       // Simulate email sending
@@ -92,6 +93,7 @@ export class SlackNotificationChannel implements NotificationChannel {
         webhook: this.config.webhookUrl,
         channel: this.config.channel,
         error: error.toJSON(),
+        payload: payload, // Using the payload variable
       }, 'Sending error notification to Slack');
 
       // In a real implementation, you would make an HTTP request to the webhook
@@ -196,6 +198,7 @@ export class WebhookNotificationChannel implements NotificationChannel {
       logger.info({
         webhook: this.config.url,
         error: error.toJSON(),
+        payload: payload, // Using the payload variable
       }, 'Sending error notification to webhook');
 
       // In a real implementation, you would make an HTTP request

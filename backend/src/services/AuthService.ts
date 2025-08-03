@@ -301,6 +301,7 @@ export class AuthService {
     try {
       // This is a placeholder implementation
       // In a real system, you'd verify the token and update the user's email_verified status
+      logger.info(`Verifying email for user ${userId} with token ${token.substring(0, 10)}...`);
       
       const success = await userModel.verifyEmail(userId);
       

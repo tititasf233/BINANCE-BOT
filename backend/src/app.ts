@@ -26,7 +26,7 @@ import { createApiRateLimiter } from './middleware/rateLimiter';
 // Gateway imports
 import ApiGateway from './gateway/ApiGateway';
 import RequestLogger from './gateway/RequestLogger';
-import RequestValidator from './gateway/RequestValidator';
+// import RequestValidator from './gateway/RequestValidator'; // Not used yet
 
 // Services
 import { initializeDatabase } from './database';

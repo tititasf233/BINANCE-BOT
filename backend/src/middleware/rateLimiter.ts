@@ -37,7 +37,6 @@ export class RateLimiter {
       try {
         const key = `rate_limit:${this.options.keyGenerator(req)}`;
         const now = Date.now();
-        const windowStart = now - this.options.windowMs;
 
         // Get current request count
         const requestsData = await redisService.get<{ count: number; resetTime: number }>(key, true);

@@ -246,7 +246,7 @@ export class HealthChecker {
       const stat = promisify(fs.stat);
       
       // Check current directory disk space
-      const stats = await stat('.');
+      await stat('.'); // Just check if directory is accessible
       
       // This is a simplified check - in production you'd want to check actual disk usage
       const status = 'healthy'; // Placeholder

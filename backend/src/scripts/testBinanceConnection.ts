@@ -79,7 +79,7 @@ async function testBinanceConnection() {
     logger.info('🧪 Testando capacidade de criar ordens (modo teste)...');
     try {
       // This is a test order that won't be executed
-      const testOrderResult = await binanceService.createTestOrder({
+      await binanceService.createTestOrder({
         symbol: 'BTCUSDT',
         side: 'BUY',
         type: 'LIMIT',
@@ -87,6 +87,8 @@ async function testBinanceConnection() {
         price: '30000', // Very low price to ensure it won't execute
         timeInForce: 'GTC',
       });
+      
+      console.log('✅ Test order creation successful');
       
       logger.info('✅ Teste de criação de ordem bem-sucedido!');
       logger.info('🎯 Sistema pode criar ordens reais quando necessário');

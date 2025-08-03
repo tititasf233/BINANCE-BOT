@@ -104,14 +104,8 @@ export class CustomErrorReporting implements ExternalErrorReportingService {
       }, 'Reporting error to custom service');
 
       // In a real implementation, you would make an HTTP request
-      // const response = await fetch(this.endpoint, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${this.apiKey}`,
-      //   },
-      //   body: JSON.stringify(payload),
-      // });
+      // For now, we'll just log the payload that would be sent
+      logger.debug('Would send payload to custom service:', payload);
 
       // Simulate custom service reporting
       await new Promise(resolve => setTimeout(resolve, 100));

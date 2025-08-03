@@ -87,7 +87,7 @@ export class TechnicalIndicators {
     prices: number[], 
     fastPeriod: number = 12, 
     slowPeriod: number = 26, 
-    _signalPeriod: number = 9 // TODO: Use signal period in calculation
+    signalPeriod: number = 9 // TODO: Use signal period in calculation
   ): MACDResult | null {
     if (prices.length < slowPeriod) {
       return null;
@@ -103,6 +103,7 @@ export class TechnicalIndicators {
     const macd = fastEMA - slowEMA;
 
     // For signal line, we need historical MACD values
+    // TODO: Implement signal line calculation using signalPeriod
     // This is a simplified version - in practice, you'd maintain MACD history
     const signal = macd; // Simplified - should be EMA of MACD values
     const histogram = macd - signal;
@@ -155,7 +156,7 @@ export class TechnicalIndicators {
     lows: number[], 
     closes: number[], 
     kPeriod: number = 14,
-    _dPeriod: number = 3 // TODO: Use D period in calculation
+    dPeriod: number = 3 // TODO: Use D period in calculation
   ): { k: number; d: number } | null {
     if (highs.length < kPeriod || lows.length < kPeriod || closes.length < kPeriod) {
       return null;
@@ -175,8 +176,8 @@ export class TechnicalIndicators {
     const k = ((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100;
 
     // For %D, we need historical %K values
-    // This is simplified - should be SMA of %K values
-    const d = k; // Simplified
+    // This is simplified - should be SMA of %K values over dPeriod
+    const d = k; // TODO: Implement proper %D calculation using dPeriod
 
     return { k, d };
   }
@@ -328,7 +329,7 @@ export class TechnicalIndicators {
     highs: number[], 
     lows: number[], 
     acceleration: number = 0.02, 
-    _maximum: number = 0.2 // TODO: Use maximum in calculation
+    maximum: number = 0.2 // TODO: Use maximum in calculation
   ): number | null {
     if (highs.length < 2 || lows.length < 2) {
       return null;
@@ -342,6 +343,7 @@ export class TechnicalIndicators {
     const prevLow = lows[lows.length - 2];
 
     // Simplified calculation - in practice, this needs more complex state management
+    // TODO: Use maximum parameter to cap acceleration factor
     const isUptrend = currentHigh > prevHigh;
     
     if (isUptrend) {
