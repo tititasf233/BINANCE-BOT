@@ -14,9 +14,13 @@ export const errorHandler = (
   error: ApiError,
   req: Request,
   res: Response,
-  _next: NextFunction
+  next: NextFunction
 ): void => {
   // Log the error
+  // next is available for error handler chaining if needed
+  if (typeof next === 'function') {
+    // Could call next(error) to pass to next error handler
+  }
   logger.error('API Error:', {
     message: error.message,
     stack: error.stack,
