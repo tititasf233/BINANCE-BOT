@@ -107,10 +107,10 @@ export class BaseError extends Error {
     this.name = this.constructor.name;
     this.code = details.code;
     this.severity = details.severity;
-    this.context = details.context;
-    this.originalError = details.originalError;
+    this.context = details.context || undefined;
+    this.originalError = details.originalError || undefined;
     this.retryable = details.retryable || false;
-    this.userMessage = details.userMessage;
+    this.userMessage = details.userMessage || undefined;
     this.timestamp = new Date();
 
     // Maintain proper stack trace
@@ -141,7 +141,7 @@ export class AuthenticationError extends BaseError {
       code,
       message,
       severity: ErrorSeverity.MEDIUM,
-      context,
+      context: context || undefined,
       retryable: false,
       userMessage: 'Authentication failed. Please check your credentials.',
     });
@@ -154,7 +154,7 @@ export class ValidationError extends BaseError {
       code,
       message,
       severity: ErrorSeverity.LOW,
-      context,
+      context: context || undefined,
       retryable: false,
       userMessage: 'Invalid input provided. Please check your data.',
     });
@@ -167,8 +167,8 @@ export class DatabaseError extends BaseError {
       code,
       message,
       severity: ErrorSeverity.HIGH,
-      context,
-      originalError,
+      context: context || undefined,
+      originalError: originalError || undefined,
       retryable: true,
       userMessage: 'Database operation failed. Please try again.',
     });
@@ -181,8 +181,8 @@ export class ExternalAPIError extends BaseError {
       code,
       message,
       severity: ErrorSeverity.MEDIUM,
-      context,
-      originalError,
+      context: context || undefined,
+      originalError: originalError || undefined,
       retryable: true,
       userMessage: 'External service temporarily unavailable. Please try again.',
     });
@@ -195,7 +195,7 @@ export class TradingError extends BaseError {
       code,
       message,
       severity: ErrorSeverity.HIGH,
-      context,
+      context: context || undefined,
       retryable: false,
       userMessage: 'Trading operation failed. Please check your settings.',
     });
@@ -208,8 +208,8 @@ export class SystemError extends BaseError {
       code,
       message,
       severity: ErrorSeverity.CRITICAL,
-      context,
-      originalError,
+      context: context || undefined,
+      originalError: originalError || undefined,
       retryable: true,
       userMessage: 'System error occurred. Our team has been notified.',
     });

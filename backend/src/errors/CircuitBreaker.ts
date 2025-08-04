@@ -36,10 +36,10 @@ export class CircuitBreaker {
   private halfOpenCalls: number = 0;
 
   constructor(private config: CircuitBreakerConfig) {
-    logger.info({
+    logger.info('Circuit breaker initialized', {
       circuitBreaker: config.name,
       config,
-    }, 'Circuit breaker initialized');
+    });
   }
 
   public async execute<T>(operation: () => Promise<T>): Promise<T> {
@@ -56,11 +56,11 @@ export class CircuitBreaker {
           }
         );
         
-        logger.warn({
+        logger.warn('Circuit breaker rejected call', {
           circuitBreaker: this.config.name,
           state: this.state,
           nextAttemptTime: this.nextAttemptTime,
-        }, 'Circuit breaker rejected call');
+        });
 
         reject(error);
         return;
@@ -98,9 +98,9 @@ export class CircuitBreaker {
           this.state = CircuitState.HALF_OPEN;
           this.halfOpenCalls = 0;
           
-          logger.info({
+          logger.info('Circuit breaker transitioning to HALF_OPEN', {
             circuitBreaker: this.config.name,
-          }, 'Circuit breaker transitioning to HALF_OPEN');
+          });
           
           return true;
         }
@@ -118,20 +118,20 @@ export class CircuitBreaker {
     this.successCount++;
     this.lastSuccessTime = new Date();
 
-    logger.debug({
+    logger.debug('Circuit breaker operation succeeded', {
       circuitBreaker: this.config.name,
       state: this.state,
       duration,
       successCount: this.successCount,
-    }, 'Circuit breaker operation succeeded');
+    });
 
     if (this.state === CircuitState.HALF_OPEN) {
       if (this.halfOpenCalls >= this.config.halfOpenMaxCalls) {
         this.reset();
         
-        logger.info({
+        logger.info('Circuit breaker recovered, transitioning to CLOSED', {
           circuitBreaker: this.config.name,
-        }, 'Circuit breaker recovered, transitioning to CLOSED');
+        });
       }
     }
   }
@@ -140,13 +140,13 @@ export class CircuitBreaker {
     this.failureCount++;
     this.lastFailureTime = new Date();
 
-    logger.warn({
+    logger.warn('Circuit breaker operation failed', {
       circuitBreaker: this.config.name,
       state: this.state,
       duration,
       failureCount: this.failureCount,
       error: error instanceof BaseError ? error.toJSON() : { message: String(error) },
-    }, 'Circuit breaker operation failed');
+    });
 
     if (this.state === CircuitState.CLOSED) {
       if (this.failureCount >= this.config.failureThreshold) {
@@ -161,19 +161,19 @@ export class CircuitBreaker {
     this.state = CircuitState.OPEN;
     this.nextAttemptTime = new Date(Date.now() + this.config.recoveryTimeout);
     
-    logger.error({
+    logger.error('Circuit breaker OPENED due to failures', {
       circuitBreaker: this.config.name,
       failureCount: this.failureCount,
       threshold: this.config.failureThreshold,
       nextAttemptTime: this.nextAttemptTime,
-    }, 'Circuit breaker OPENED due to failures');
+    });
   }
 
   private reset(): void {
     this.state = CircuitState.CLOSED;
     this.failureCount = 0;
     this.halfOpenCalls = 0;
-    this.nextAttemptTime = undefined;
+    this.nextAttemptTime = undefined as any;
   }
 
   public getStats(): CircuitBreakerStats {
@@ -192,17 +192,17 @@ export class CircuitBreaker {
     this.state = CircuitState.OPEN;
     this.nextAttemptTime = new Date(Date.now() + this.config.recoveryTimeout);
     
-    logger.warn({
+    logger.warn('Circuit breaker manually opened', {
       circuitBreaker: this.config.name,
-    }, 'Circuit breaker manually opened');
+    });
   }
 
   public forceClose(): void {
     this.reset();
     
-    logger.info({
+    logger.info('Circuit breaker manually closed', {
       circuitBreaker: this.config.name,
-    }, 'Circuit breaker manually closed');
+    });
   }
 
   public forceClosed(): void {
@@ -292,7 +292,7 @@ export class CircuitBreakerManager {
 
 // Decorator for automatic circuit breaker
 export function withCircuitBreaker(name: string, config?: Partial<CircuitBreakerConfig>) {
-  return function (target: object, propertyName: string, descriptor: PropertyDescriptor) {
+  return function (_target: object, _propertyName: string, descriptor: PropertyDescriptor) {
     const method = descriptor.value;
 
     descriptor.value = async function (...args: unknown[]) {

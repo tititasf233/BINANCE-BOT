@@ -24,7 +24,7 @@ describe('HealthChecker', () => {
     mockDb = new MockedDatabaseConnection() as jest.Mocked<DatabaseConnection>;
     mockBinanceApi = new MockedBinanceApiService({
       apiKey: 'test-key',
-      apiSecret: 'test-secret'
+      secretKey: 'test-secret'
     }) as jest.Mocked<BinanceApiService>;
     
     healthChecker = new HealthChecker();

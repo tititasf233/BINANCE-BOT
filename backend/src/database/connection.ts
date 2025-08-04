@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from 'pg';
-import { logger } from '@/utils/logger';
-import { errorToLogObject } from '@/utils/errorUtils';
+import { logger } from '../utils/logger';
+import { errorToLogObject } from '../utils/errorUtils';
 
 interface DatabaseConfig {
   host: string;

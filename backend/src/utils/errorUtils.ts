@@ -25,7 +25,7 @@ export function errorToLogObject(error: unknown): Record<string, any> {
       error: error.message,
       name: error.name,
       stack: error.stack,
-      ...(error.cause && { cause: errorToLogObject(error.cause) })
+      ...((error as any).cause && { cause: errorToLogObject((error as any).cause) })
     };
   }
 

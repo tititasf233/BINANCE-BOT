@@ -1,7 +1,7 @@
-import { userModel, UserFields } from '@/database/models/User';
-import { CryptoUtils } from '@/utils/crypto';
-import { logger } from '@/utils/logger';
-import { errorToLogObject } from '@/utils/errorUtils';
+import { userModel, UserFields } from '../database/models/User';
+import { CryptoUtils } from '../utils/crypto';
+import { logger } from '../utils/logger';
+import { errorToLogObject } from '../utils/errorUtils';
 
 export interface RegisterData {
   username: string;

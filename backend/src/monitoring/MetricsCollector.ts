@@ -83,10 +83,10 @@ export class MetricsCollector {
     };
 
     // Store metrics in Redis with TTL of 24 hours
-    await this.redis.setex(
+    await this.redis.set(
       `${this.METRICS_KEY}:${metrics.timestamp}`,
-      86400,
-      JSON.stringify(metrics)
+      JSON.stringify(metrics),
+      86400
     );
 
     // Keep only last 100 metric entries
@@ -190,7 +190,7 @@ export class MetricsCollector {
     if (metric.maxDrawdown !== undefined) current.maxDrawdown = metric.maxDrawdown;
     if (metric.sharpeRatio !== undefined) current.sharpeRatio = metric.sharpeRatio;
 
-    await this.redis.setex(key, 86400, JSON.stringify(current));
+    await this.redis.set(key, JSON.stringify(current), 86400);
   }
 
   public async getSystemMetrics(hours: number = 1): Promise<SystemMetrics[]> {

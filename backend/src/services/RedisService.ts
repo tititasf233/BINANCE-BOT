@@ -424,6 +424,18 @@ export class RedisService {
   }
 
   /**
+   * Get the number of members in a set
+   */
+  async scard(key: string): Promise<number> {
+    try {
+      return await this.client.sCard(key);
+    } catch (error) {
+      logger.error('Redis scard error:', { error: (error as Error).message });
+      throw error;
+    }
+  }
+
+  /**
    * Flush all data (use with caution!)
    */
   async flushall(): Promise<string> {

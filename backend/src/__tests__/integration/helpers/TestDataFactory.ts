@@ -68,7 +68,8 @@ export class TestDataFactory {
     };
 
     const apiKeyData = { ...defaultApiKey, ...overrides };
-    const encryptedSecretKey = CryptoUtils.encrypt(apiKeyData.binanceSecretKey, 'test-iv');
+    const encryptedResult = CryptoUtils.encrypt(apiKeyData.binanceSecretKey, 'test-iv');
+    const encryptedSecretKey = encryptedResult.encrypted;
 
     const client = await this.dbPool.connect();
     try {

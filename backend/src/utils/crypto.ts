@@ -58,10 +58,10 @@ export class CryptoUtils {
       };
 
       return jwt.sign(tokenPayload, JWT_SECRET, {
-        expiresIn: JWT_EXPIRES_IN as string | number,
+        expiresIn: JWT_EXPIRES_IN,
         issuer: 'aura-trading-system',
         audience: 'aura-users'
-      });
+      } as jwt.SignOptions);
     } catch (error) {
       logger.error('Error generating access token:', errorToLogObject(error));
       throw new Error('Failed to generate access token');
@@ -79,10 +79,10 @@ export class CryptoUtils {
       };
 
       return jwt.sign(tokenPayload, JWT_SECRET, {
-        expiresIn: JWT_REFRESH_EXPIRES_IN as string | number,
+        expiresIn: JWT_REFRESH_EXPIRES_IN,
         issuer: 'aura-trading-system',
         audience: 'aura-users'
-      });
+      } as jwt.SignOptions);
     } catch (error) {
       logger.error('Error generating refresh token:', errorToLogObject(error));
       throw new Error('Failed to generate refresh token');
