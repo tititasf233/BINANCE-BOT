@@ -4,7 +4,7 @@ import { IntegrationTestSetup, cleanupBetweenTests } from './setup';
 import { TestDataFactory } from './helpers/TestDataFactory';
 import { BinanceMockServer } from './helpers/BinanceMockServer';
 import { MessageBrokerService } from '../../services/MessageBrokerService';
-import { DataIngestorService } from '../../services/DataIngestorService';
+// import { DataIngestorService } from '../../services/DataIngestorService'; // Removed - not needed
 import { StrategyEngineService } from '../../services/StrategyEngineService';
 import { ExecutionEngineService } from '../../services/ExecutionEngineService';
 import jwt from 'jsonwebtoken';
