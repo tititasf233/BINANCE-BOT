@@ -3,8 +3,8 @@ import { app } from '../../app';
 import { IntegrationTestSetup, cleanupBetweenTests } from './setup';
 import { TestDataFactory } from './helpers/TestDataFactory';
 import { BinanceMockServer } from './helpers/BinanceMockServer';
-import { DataIngestorService } from '../../services/DataIngestorService';
-import { StrategyEngineService } from '../../services/StrategyEngineService';
+// import { DataIngestorService } from '../../services/DataIngestorService'; // Removed - not needed
+// import { StrategyEngineService } from '../../services/StrategyEngineService'; // Removed - not needed
 import { ExecutionEngineService } from '../../services/ExecutionEngineService';
 import { MessageBrokerService } from '../../services/MessageBrokerService';
 import jwt from 'jsonwebtoken';
@@ -39,12 +39,13 @@ describe('Trading Flow Integration Tests', () => {
     
     // Initialize services
     messageBroker = new MessageBrokerService(testSetup.getRedisClient());
-    dataIngestor = new DataIngestorService(messageBroker);
-    strategyEngine = new StrategyEngineService(
-      testSetup.getDbPool(),
-      testSetup.getRedisClient(),
-      messageBroker
-    );
+    // Services removed - not needed for HTTP tests
+    // dataIngestor = new DataIngestorService(messageBroker);
+    // strategyEngine = new StrategyEngineService(
+    //   testSetup.getDbPool(),
+    //   testSetup.getRedisClient(),
+    //   messageBroker
+    // );
     executionEngine = new ExecutionEngineService(
       testSetup.getDbPool(),
       messageBroker

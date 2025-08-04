@@ -137,6 +137,7 @@ describe('MetricsCollector', () => {
       ]);
 
       const result = await metricsCollector.getSystemMetrics(1); // 1 hour
+      console.log(`System metrics result: ${result.length} entries`);
 
       expect(mockRedis.keys).toHaveBeenCalledWith('system:metrics:*');
       // Should only include recent metrics within 1 hour

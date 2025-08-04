@@ -56,7 +56,7 @@ describe('DataIngestorService', () => {
 
     it('should handle connection timeout', async () => {
       // Mock connection timeout
-      mockWs.once.mockImplementation((event, callback) => {
+      mockWs.once.mockImplementation(() => {
         // Don't call callback to simulate timeout
         return mockWs;
       });

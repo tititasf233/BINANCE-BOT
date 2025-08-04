@@ -8,7 +8,7 @@ import { DataIngestorService } from '../../services/DataIngestorService';
 import { StrategyEngineService } from '../../services/StrategyEngineService';
 import { ExecutionEngineService } from '../../services/ExecutionEngineService';
 import jwt from 'jsonwebtoken';
-import Redis from 'ioredis';
+// import Redis from 'ioredis'; // Removed - not needed directly
 
 describe('Failure Recovery Integration Tests', () => {
   let testSetup: IntegrationTestSetup;

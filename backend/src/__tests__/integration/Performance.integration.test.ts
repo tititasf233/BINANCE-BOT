@@ -4,8 +4,8 @@ import { IntegrationTestSetup, cleanupBetweenTests } from './setup';
 import { TestDataFactory } from './helpers/TestDataFactory';
 import { BinanceMockServer } from './helpers/BinanceMockServer';
 import { MessageBrokerService } from '../../services/MessageBrokerService';
-import { DataIngestorService } from '../../services/DataIngestorService';
-import { StrategyEngineService } from '../../services/StrategyEngineService';
+// DataIngestorService import removed - not needed for HTTP tests
+// import { StrategyEngineService } from '../../services/StrategyEngineService'; // Removed - not needed
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
 

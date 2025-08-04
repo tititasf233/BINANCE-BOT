@@ -284,6 +284,7 @@ export class BinanceMockServer {
     // Historical klines
     this.app.get('/api/v3/klines', (req, res) => {
       const { symbol, interval, startTime, endTime, limit = 500 } = req.query;
+      console.log(`Mock klines for ${symbol} with interval ${interval}`);
       
       // Generate mock kline data
       const mockKlines = [];
