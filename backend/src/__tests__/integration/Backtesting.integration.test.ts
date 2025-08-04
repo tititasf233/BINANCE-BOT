@@ -10,7 +10,7 @@ describe('Backtesting Integration Tests', () => {
   let testSetup: IntegrationTestSetup;
   let testDataFactory: TestDataFactory;
   let binanceMockServer: BinanceMockServer;
-  let backtestingService: BacktestingService;
+  // let backtestingService: BacktestingService; // Not used in HTTP tests
   let authToken: string;
   let testUser: any;
   let testStrategy: any;
@@ -29,11 +29,11 @@ describe('Backtesting Integration Tests', () => {
     // Override Binance API URL for tests
     process.env.BINANCE_BASE_URL = 'http://localhost:3001';
     
-    // Initialize backtesting service
-    backtestingService = new BacktestingService(
-      testSetup.getDbPool(),
-      testSetup.getRedisClient()
-    );
+    // Initialize backtesting service (not needed for HTTP tests)
+    // backtestingService = new BacktestingService(
+    //   testSetup.getDbPool(),
+    //   testSetup.getRedisClient()
+    // );
   });
 
   afterAll(async () => {

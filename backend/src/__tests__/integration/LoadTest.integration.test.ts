@@ -164,7 +164,7 @@ describe('Load Testing Integration Tests', () => {
 
       // Wait for completion with progress monitoring
       let backtestComplete = false;
-      let lastProgressTime = Date.now();
+      // let lastProgressTime = Date.now(); // Not used for reading
       const maxWaitTime = 120000; // 2 minutes
       const checkInterval = 5000; // Check every 5 seconds
 
@@ -187,7 +187,7 @@ describe('Load Testing Integration Tests', () => {
           throw new Error('Backtest failed');
         }
 
-        lastProgressTime = currentTime;
+        // lastProgressTime = currentTime; // Not used for reading
       }
 
       const endTime = performance.now();

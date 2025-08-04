@@ -15,9 +15,9 @@ describe('Failure Recovery Integration Tests', () => {
   let testDataFactory: TestDataFactory;
   let binanceMockServer: BinanceMockServer;
   let messageBroker: MessageBrokerService;
-  let dataIngestor: DataIngestorService;
-  let strategyEngine: StrategyEngineService;
-  let executionEngine: ExecutionEngineService;
+  // let dataIngestor: DataIngestorService; // Not used directly in tests
+  // let strategyEngine: StrategyEngineService; // Not used directly in tests  
+  // let executionEngine: ExecutionEngineService; // Not used directly in tests
   let authToken: string;
   let testUser: any;
 
@@ -37,16 +37,17 @@ describe('Failure Recovery Integration Tests', () => {
     
     // Initialize services
     messageBroker = new MessageBrokerService(testSetup.getRedisClient());
-    dataIngestor = new DataIngestorService(messageBroker);
-    strategyEngine = new StrategyEngineService(
-      testSetup.getDbPool(),
-      testSetup.getRedisClient(),
-      messageBroker
-    );
-    executionEngine = new ExecutionEngineService(
-      testSetup.getDbPool(),
-      messageBroker
-    );
+    // Services are created locally in tests when needed
+    // dataIngestor = new DataIngestorService(messageBroker);
+    // strategyEngine = new StrategyEngineService(
+    //   testSetup.getDbPool(),
+    //   testSetup.getRedisClient(),
+    //   messageBroker
+    // );
+    // executionEngine = new ExecutionEngineService(
+    //   testSetup.getDbPool(),
+    //   messageBroker
+    // );
     
     await messageBroker.connect();
   });
