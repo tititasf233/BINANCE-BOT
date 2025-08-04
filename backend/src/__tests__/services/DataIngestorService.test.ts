@@ -38,7 +38,7 @@ describe('DataIngestorService', () => {
       // Mock successful connection
       mockWs.once.mockImplementation((event, callback) => {
         if (event === 'open') {
-          setTimeout(() => callback(), 0);
+          setTimeout(() => callback.call(mockWs), 0);
         }
         return mockWs;
       });
@@ -83,7 +83,7 @@ describe('DataIngestorService', () => {
       // Mock successful connection
       mockWs.once.mockImplementation((event, callback) => {
         if (event === 'open') {
-          setTimeout(() => callback(), 0);
+          setTimeout(() => callback.call(mockWs), 0);
         }
         return mockWs;
       });
@@ -152,7 +152,7 @@ describe('DataIngestorService', () => {
       // Mock successful connection
       mockWs.once.mockImplementation((event, callback) => {
         if (event === 'open') {
-          setTimeout(() => callback(), 0);
+          setTimeout(() => callback.call(mockWs), 0);
         }
         return mockWs;
       });
@@ -200,7 +200,7 @@ describe('DataIngestorService', () => {
       // Simulate receiving message
       const messageHandler = mockWs.on.mock.calls.find(call => call[0] === 'message')?.[1];
       if (messageHandler) {
-        messageHandler(JSON.stringify(klineMessage));
+        messageHandler.call(mockWs, JSON.stringify(klineMessage));
       }
     });
 
@@ -232,7 +232,7 @@ describe('DataIngestorService', () => {
       // Simulate receiving message
       const messageHandler = mockWs.on.mock.calls.find(call => call[0] === 'message')?.[1];
       if (messageHandler) {
-        messageHandler(JSON.stringify(tickerMessage));
+        messageHandler.call(mockWs, JSON.stringify(tickerMessage));
       }
     });
 
@@ -262,7 +262,7 @@ describe('DataIngestorService', () => {
       // Simulate receiving message
       const messageHandler = mockWs.on.mock.calls.find(call => call[0] === 'message')?.[1];
       if (messageHandler) {
-        messageHandler(JSON.stringify(klineMessage));
+        messageHandler.call(mockWs, JSON.stringify(klineMessage));
       }
 
       expect(klineHandler).not.toHaveBeenCalled();
