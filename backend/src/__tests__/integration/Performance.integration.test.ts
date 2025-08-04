@@ -4,8 +4,8 @@ import { IntegrationTestSetup, cleanupBetweenTests } from './setup';
 import { TestDataFactory } from './helpers/TestDataFactory';
 import { BinanceMockServer } from './helpers/BinanceMockServer';
 import { MessageBrokerService } from '../../services/MessageBrokerService';
-// import { DataIngestorService } from '../../services/DataIngestorService'; // Not used directly
-// import { StrategyEngineService } from '../../services/StrategyEngineService'; // Not used directly
+import { DataIngestorService } from '../../services/DataIngestorService';
+import { StrategyEngineService } from '../../services/StrategyEngineService';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
 
@@ -14,8 +14,8 @@ describe('Performance and Latency Integration Tests', () => {
   let testDataFactory: TestDataFactory;
   let binanceMockServer: BinanceMockServer;
   let messageBroker: MessageBrokerService;
-  let dataIngestor: DataIngestorService;
-  let strategyEngine: StrategyEngineService;
+  // let dataIngestor: DataIngestorService; // Not used directly in tests
+  // let strategyEngine: StrategyEngineService; // Not used directly in tests
   let authToken: string;
   let testUser: any;
 
@@ -35,12 +35,13 @@ describe('Performance and Latency Integration Tests', () => {
     
     // Initialize services
     messageBroker = new MessageBrokerService(testSetup.getRedisClient());
-    dataIngestor = new DataIngestorService(messageBroker);
-    strategyEngine = new StrategyEngineService(
-      testSetup.getDbPool(),
-      testSetup.getRedisClient(),
-      messageBroker
-    );
+    // Services created locally in tests when needed
+    // dataIngestor = new DataIngestorService(messageBroker);
+    // strategyEngine = new StrategyEngineService(
+    //   testSetup.getDbPool(),
+    //   testSetup.getRedisClient(),
+    //   messageBroker
+    // );
     
     await messageBroker.connect();
   });
