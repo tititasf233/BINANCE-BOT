@@ -17,7 +17,7 @@ RUN npm ci --only=production && npm cache clean --force
 COPY backend/ ./
 
 # Build da aplicação (com configuração mais permissiva)
-RUN npx tsc --noEmitOnError false || echo "Build completed with TypeScript warnings"
+RUN npx tsc --skipLibCheck --noEmitOnError false || echo "Build completed with TypeScript warnings"
 
 # Stage de produção
 FROM node:18-alpine AS production

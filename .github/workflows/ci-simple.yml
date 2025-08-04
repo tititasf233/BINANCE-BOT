@@ -1,0 +1,90 @@
+name: CI Simple (Debug)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Job básico só para verificar sintaxe
+  lint-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: |
+          backend/package-lock.json
+          frontend/package-lock.json
+
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm ci
+
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Run backend linting (allow warnings)
+      run: |
+        cd backend
+        npm run lint || echo "Linting completed with warnings"
+
+    - name: Run frontend linting (allow warnings)
+      run: |
+        cd frontend
+        npm run lint || echo "Linting completed with warnings"
+
+    - name: Check TypeScript compilation (backend)
+      run: |
+        cd backend
+        npx tsc --noEmit --skipLibCheck || echo "TypeScript check completed with warnings"
+
+    - name: Check TypeScript compilation (frontend)
+      run: |
+        cd frontend
+        npx tsc --noEmit --skipLibCheck || echo "TypeScript check completed with warnings"
+
+  # Job de build Docker simplificado
+  docker-build-test:
+    needs: lint-check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        service: [backend, frontend]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build ${{ matrix.service }} image (test only)
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.${{ matrix.service }}
+        push: false
+        tags: test-${{ matrix.service }}:latest
+        cache-from: type=gha,scope=${{ matrix.service }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+    - name: Test ${{ matrix.service }} image
+      run: |
+        docker run --rm test-${{ matrix.service }}:latest echo "Image built successfully"

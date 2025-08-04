@@ -1,6 +1,6 @@
 import { HealthChecker } from '../../monitoring/HealthChecker';
 import { RedisService } from '../../services/RedisService';
-import db from '../../database/connection';
+import { DatabaseConnection } from '../../database/connection';
 import { BinanceApiService } from '../../services/BinanceApiService';
 
 // Mock dependencies
