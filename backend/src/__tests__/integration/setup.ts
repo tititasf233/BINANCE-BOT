@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 // import { DatabaseConnection } from '../../database/connection'; // Not used directly
 // import { RedisService } from '../../services/RedisService'; // Not used directly
 import { logger } from '../../utils/logger';
+import { errorToLogObject } from '../../utils/errorUtils';
 
 export class IntegrationTestSetup {
   private static instance: IntegrationTestSetup;
@@ -36,7 +37,7 @@ export class IntegrationTestSetup {
       
       logger.info('Integration test database connected successfully');
     } catch (error) {
-      logger.error('Failed to setup test database:', error);
+      logger.error('Failed to setup test database:', errorToLogObject(error));
       throw error;
     }
   }
@@ -56,7 +57,7 @@ export class IntegrationTestSetup {
       
       logger.info('Integration test Redis connected successfully');
     } catch (error) {
-      logger.error('Failed to setup test Redis:', error);
+      logger.error('Failed to setup test Redis:', errorToLogObject(error));
       throw error;
     }
   }
@@ -85,7 +86,7 @@ export class IntegrationTestSetup {
       client.release();
       logger.info('Test database cleaned successfully');
     } catch (error) {
-      logger.error('Failed to clean test database:', error);
+      logger.error('Failed to clean test database:', errorToLogObject(error));
       throw error;
     }
   }
@@ -97,7 +98,7 @@ export class IntegrationTestSetup {
       await this.redisClient.flushdb();
       logger.info('Test Redis cleaned successfully');
     } catch (error) {
-      logger.error('Failed to clean test Redis:', error);
+      logger.error('Failed to clean test Redis:', errorToLogObject(error));
       throw error;
     }
   }
@@ -116,7 +117,7 @@ export class IntegrationTestSetup {
       
       logger.info('Integration test teardown completed');
     } catch (error) {
-      logger.error('Failed to teardown integration tests:', error);
+      logger.error('Failed to teardown integration tests:', errorToLogObject(error));
       throw error;
     }
   }

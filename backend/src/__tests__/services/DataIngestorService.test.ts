@@ -69,7 +69,7 @@ describe('DataIngestorService', () => {
       
       mockWs.once.mockImplementation((event, callback) => {
         if (event === 'error') {
-          setTimeout(() => callback(connectionError), 0);
+          setTimeout(() => callback.call(mockWs, connectionError), 0);
         }
         return mockWs;
       });

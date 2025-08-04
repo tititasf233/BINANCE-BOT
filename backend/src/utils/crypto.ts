@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { logger } from './logger';
+import { errorToLogObject } from './errorUtils';
 
 // JWT Configuration
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
@@ -29,7 +30,7 @@ export class CryptoUtils {
       const salt = await bcrypt.genSalt(SALT_ROUNDS);
       return await bcrypt.hash(password, salt);
     } catch (error) {
-      logger.error('Error hashing password:', error);
+      logger.error('Error hashing password:', errorToLogObject(error));
       throw new Error('Failed to hash password');
     }
   }
@@ -41,7 +42,7 @@ export class CryptoUtils {
     try {
       return await bcrypt.compare(password, hash);
     } catch (error) {
-      logger.error('Error verifying password:', error);
+      logger.error('Error verifying password:', errorToLogObject(error));
       throw new Error('Failed to verify password');
     }
   }
@@ -57,12 +58,12 @@ export class CryptoUtils {
       };
 
       return jwt.sign(tokenPayload, JWT_SECRET, {
-        expiresIn: JWT_EXPIRES_IN,
+        expiresIn: JWT_EXPIRES_IN as string | number,
         issuer: 'aura-trading-system',
         audience: 'aura-users'
       });
     } catch (error) {
-      logger.error('Error generating access token:', error);
+      logger.error('Error generating access token:', errorToLogObject(error));
       throw new Error('Failed to generate access token');
     }
   }
@@ -78,12 +79,12 @@ export class CryptoUtils {
       };
 
       return jwt.sign(tokenPayload, JWT_SECRET, {
-        expiresIn: JWT_REFRESH_EXPIRES_IN,
+        expiresIn: JWT_REFRESH_EXPIRES_IN as string | number,
         issuer: 'aura-trading-system',
         audience: 'aura-users'
       });
     } catch (error) {
-      logger.error('Error generating refresh token:', error);
+      logger.error('Error generating refresh token:', errorToLogObject(error));
       throw new Error('Failed to generate refresh token');
     }
   }
@@ -105,7 +106,7 @@ export class CryptoUtils {
       } else if (error instanceof jwt.JsonWebTokenError) {
         throw new Error('Invalid token');
       } else {
-        logger.error('Error verifying token:', error);
+        logger.error('Error verifying token:', errorToLogObject(error));
         throw new Error('Token verification failed');
       }
     }
@@ -171,7 +172,7 @@ export class CryptoUtils {
         iv: iv.toString('hex')
       };
     } catch (error) {
-      logger.error('Error encrypting data:', error);
+      logger.error('Error encrypting data:', errorToLogObject(error));
       throw new Error('Failed to encrypt data');
     }
   }
@@ -187,7 +188,8 @@ export class CryptoUtils {
       }
 
       const [encrypted, authTag] = encryptedData.split(':');
-      const decipher = crypto.createDecipher('aes-256-gcm', encryptionKey);
+      const ivBuffer = Buffer.from(iv, 'hex');
+      const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(encryptionKey.slice(0, 32)), ivBuffer);
       
       decipher.setAuthTag(Buffer.from(authTag, 'hex'));
       
@@ -196,7 +198,7 @@ export class CryptoUtils {
       
       return decrypted;
     } catch (error) {
-      logger.error('Error decrypting data:', error);
+      logger.error('Error decrypting data:', errorToLogObject(error));
       throw new Error('Failed to decrypt data');
     }
   }

@@ -42,20 +42,20 @@ export class RetryManager {
       attempt++;
       
       try {
-        logger.debug({
+        logger.debug('Executing operation with retry', {
           context,
           attempt,
           maxAttempts: finalConfig.maxAttempts,
-        }, 'Executing operation with retry');
+        });
 
         const result = await operation();
         
         if (attempt > 1) {
-          logger.info({
+          logger.info('Operation succeeded after retry', {
             context,
             attempt,
             totalTime: Date.now() - startTime,
-          }, 'Operation succeeded after retry');
+          });
         }
 
         return result;
@@ -69,23 +69,23 @@ export class RetryManager {
 
         lastError = baseError;
 
-        logger.warn({
+        logger.warn('Operation failed, checking retry conditions', {
           context,
           attempt,
           maxAttempts: finalConfig.maxAttempts,
           error: baseError.toJSON(),
-        }, 'Operation failed, checking retry conditions');
+        });
 
         // Check if we should retry
         const shouldRetry = finalConfig.retryCondition!(baseError) && attempt < finalConfig.maxAttempts;
 
         if (!shouldRetry) {
-          logger.error({
+          logger.error('Operation failed, no more retries', {
             context,
             attempt,
             totalTime: Date.now() - startTime,
             error: baseError.toJSON(),
-          }, 'Operation failed, no more retries');
+          });
           
           throw baseError;
         }
@@ -94,11 +94,11 @@ export class RetryManager {
         if (attempt < finalConfig.maxAttempts) {
           const delay = RetryManager.calculateDelay(attempt, finalConfig);
           
-          logger.info({
+          logger.info('Waiting before next retry attempt', {
             context,
             attempt,
             nextAttemptIn: delay,
-          }, 'Waiting before next retry attempt');
+          });
 
           await RetryManager.sleep(delay);
         }

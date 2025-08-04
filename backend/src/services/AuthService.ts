@@ -1,6 +1,7 @@
 import { userModel, UserFields } from '@/database/models/User';
 import { CryptoUtils } from '@/utils/crypto';
 import { logger } from '@/utils/logger';
+import { errorToLogObject } from '@/utils/errorUtils';
 
 export interface RegisterData {
   username: string;
@@ -110,7 +111,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Registration error:', error);
+      logger.error('Registration error:', errorToLogObject(error));
       return {
         success: false,
         error: 'Registration failed',
@@ -183,7 +184,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Login error:', error);
+      logger.error('Login error:', errorToLogObject(error));
       return {
         success: false,
         error: 'Login failed',
@@ -222,7 +223,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token refresh error:', error);
+      logger.error('Token refresh error:', errorToLogObject(error));
       return {
         success: false,
         error: 'Token refresh failed',
@@ -285,7 +286,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Password change error:', error);
+      logger.error('Password change error:', errorToLogObject(error));
       return {
         success: false,
         error: 'Password change failed',
@@ -317,7 +318,7 @@ export class AuthService {
       }
 
     } catch (error) {
-      logger.error('Email verification error:', error);
+      logger.error('Email verification error:', errorToLogObject(error));
       return {
         success: false,
         error: 'Email verification failed',
@@ -362,7 +363,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Get user profile error:', error);
+      logger.error('Get user profile error:', errorToLogObject(error));
       return {
         success: false,
         error: 'Failed to get user profile'
@@ -389,7 +390,7 @@ export class AuthService {
       }
 
     } catch (error) {
-      logger.error('Account deactivation error:', error);
+      logger.error('Account deactivation error:', errorToLogObject(error));
       return {
         success: false,
         error: 'Account deactivation failed',

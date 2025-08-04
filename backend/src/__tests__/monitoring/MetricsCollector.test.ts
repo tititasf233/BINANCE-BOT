@@ -62,14 +62,14 @@ describe('MetricsCollector', () => {
       };
 
       mockRedis.get.mockResolvedValue(null);
-      mockRedis.setex.mockResolvedValue('OK');
+      mockRedis.set.mockResolvedValue();
 
       await metricsCollector.recordTradingMetric(metric);
 
-      expect(mockRedis.setex).toHaveBeenCalledWith(
+      expect(mockRedis.set).toHaveBeenCalledWith(
         'trading:metrics:BTCUSDT:RSI',
-        86400,
-        expect.stringContaining('"symbol":"BTCUSDT"')
+        expect.stringContaining('"symbol":"BTCUSDT"'),
+        86400
       );
     });
 
@@ -93,14 +93,14 @@ describe('MetricsCollector', () => {
       };
 
       mockRedis.get.mockResolvedValue(JSON.stringify(existingMetric));
-      mockRedis.setex.mockResolvedValue('OK');
+      mockRedis.set.mockResolvedValue();
 
       await metricsCollector.recordTradingMetric(updateMetric);
 
-      expect(mockRedis.setex).toHaveBeenCalledWith(
+      expect(mockRedis.set).toHaveBeenCalledWith(
         'trading:metrics:BTCUSDT:RSI',
-        86400,
-        expect.stringContaining('"totalTrades":10')
+        expect.stringContaining('"totalTrades":10'),
+        86400
       );
     });
   });

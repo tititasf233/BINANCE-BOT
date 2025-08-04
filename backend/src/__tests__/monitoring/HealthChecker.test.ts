@@ -1,6 +1,6 @@
 import { HealthChecker } from '../../monitoring/HealthChecker';
 import { RedisService } from '../../services/RedisService';
-import { DatabaseConnection } from '../../database/connection';
+import db from '../../database/connection';
 import { BinanceApiService } from '../../services/BinanceApiService';
 
 // Mock dependencies
@@ -22,7 +22,10 @@ describe('HealthChecker', () => {
     jest.clearAllMocks();
     mockRedis = new MockedRedisService() as jest.Mocked<RedisService>;
     mockDb = new MockedDatabaseConnection() as jest.Mocked<DatabaseConnection>;
-    mockBinanceApi = new MockedBinanceApiService() as jest.Mocked<BinanceApiService>;
+    mockBinanceApi = new MockedBinanceApiService({
+      apiKey: 'test-key',
+      apiSecret: 'test-secret'
+    }) as jest.Mocked<BinanceApiService>;
     
     healthChecker = new HealthChecker();
     (healthChecker as any).redis = mockRedis;
@@ -36,7 +39,7 @@ describe('HealthChecker', () => {
 
   describe('start', () => {
     it('should start health checks', async () => {
-      mockRedis.setex.mockResolvedValue('OK');
+      mockRedis.set.mockResolvedValue();
       
       await healthChecker.start();
       
@@ -46,7 +49,7 @@ describe('HealthChecker', () => {
 
   describe('stop', () => {
     it('should stop health checks', async () => {
-      mockRedis.setex.mockResolvedValue('OK');
+      mockRedis.set.mockResolvedValue();
       
       await healthChecker.start();
       await healthChecker.stop();
@@ -57,7 +60,7 @@ describe('HealthChecker', () => {
 
   describe('performHealthCheck', () => {
     beforeEach(() => {
-      mockRedis.setex.mockResolvedValue('OK');
+      mockRedis.set.mockResolvedValue();
     });
 
     it('should return healthy status when all services are healthy', async () => {

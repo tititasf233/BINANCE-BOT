@@ -12,7 +12,7 @@ describe('ErrorHandler', () => {
     
     mockRequest = {
       headers: { 'x-request-id': 'test-request-id' },
-      user: { id: 'test-user-id' },
+      user: { id: 123 },
       url: '/test',
       method: 'GET',
       ip: '127.0.0.1',

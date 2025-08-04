@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
-import bcrypt from 'bcrypt';
-import { encrypt } from '../../../utils/crypto';
+import bcrypt from 'bcryptjs';
+import { CryptoUtils } from '../../../utils/crypto';
 
 export interface TestUser {
   id: number;
@@ -68,7 +68,7 @@ export class TestDataFactory {
     };
 
     const apiKeyData = { ...defaultApiKey, ...overrides };
-    const encryptedSecretKey = encrypt(apiKeyData.binanceSecretKey);
+    const encryptedSecretKey = CryptoUtils.encrypt(apiKeyData.binanceSecretKey, 'test-iv');
 
     const client = await this.dbPool.connect();
     try {

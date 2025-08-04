@@ -1,5 +1,6 @@
 import { Pool, PoolClient } from 'pg';
 import { logger } from '@/utils/logger';
+import { errorToLogObject } from '@/utils/errorUtils';
 
 interface DatabaseConfig {
   host: string;
@@ -53,7 +54,7 @@ class DatabaseConnection {
       client.release();
       logger.info('Database connection established successfully');
     } catch (error) {
-      logger.error('Failed to connect to database:', error);
+      logger.error('Failed to connect to database:', errorToLogObject(error));
       throw error;
     }
   }

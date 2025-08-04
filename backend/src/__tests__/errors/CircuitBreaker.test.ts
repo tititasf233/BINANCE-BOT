@@ -26,7 +26,7 @@ describe('CircuitBreaker', () => {
 
     it('should open circuit after failure threshold', async () => {
       const error = new BaseError({
-        code: ErrorCode.EXTERNAL_API_ERROR,
+        code: ErrorCode.BINANCE_API_ERROR,
         message: 'API error',
         severity: ErrorSeverity.MEDIUM,
         retryable: true,
@@ -50,7 +50,7 @@ describe('CircuitBreaker', () => {
 
     it('should reject calls when circuit is open', async () => {
       const error = new BaseError({
-        code: ErrorCode.EXTERNAL_API_ERROR,
+        code: ErrorCode.BINANCE_API_ERROR,
         message: 'API error',
         severity: ErrorSeverity.MEDIUM,
         retryable: true,
@@ -73,7 +73,7 @@ describe('CircuitBreaker', () => {
 
     it('should transition to half-open after recovery timeout', async () => {
       const error = new BaseError({
-        code: ErrorCode.EXTERNAL_API_ERROR,
+        code: ErrorCode.BINANCE_API_ERROR,
         message: 'API error',
         severity: ErrorSeverity.MEDIUM,
         retryable: true,
@@ -104,7 +104,7 @@ describe('CircuitBreaker', () => {
 
     it('should close circuit after successful half-open calls', async () => {
       const error = new BaseError({
-        code: ErrorCode.EXTERNAL_API_ERROR,
+        code: ErrorCode.BINANCE_API_ERROR,
         message: 'API error',
         severity: ErrorSeverity.MEDIUM,
         retryable: true,
@@ -156,7 +156,7 @@ describe('CircuitBreaker', () => {
 
     it('should allow manual closing', async () => {
       const error = new BaseError({
-        code: ErrorCode.EXTERNAL_API_ERROR,
+        code: ErrorCode.BINANCE_API_ERROR,
         message: 'API error',
         severity: ErrorSeverity.MEDIUM,
         retryable: true,

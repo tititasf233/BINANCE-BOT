@@ -412,6 +412,18 @@ export class RedisService {
   }
 
   /**
+   * Get keys matching a pattern
+   */
+  async keys(pattern: string): Promise<string[]> {
+    try {
+      return await this.client.keys(pattern);
+    } catch (error) {
+      logger.error('Redis keys error:', { error: (error as Error).message });
+      throw error;
+    }
+  }
+
+  /**
    * Flush all data (use with caution!)
    */
   async flushall(): Promise<string> {
