@@ -1,6 +1,6 @@
 import express from 'express';
 import { Server } from 'http';
-import crypto from 'crypto';
+// import crypto from 'crypto'; // Not used currently
 
 export interface MockOrderResponse {
   symbol: string;
@@ -169,7 +169,7 @@ export class BinanceMockServer {
         quantity,
         price,
         stopPrice,
-        stopLimitPrice,
+        stopLimitPrice, // Used for OCO orders
         stopLimitTimeInForce = 'GTC',
         listClientOrderId,
       } = req.body;
@@ -183,6 +183,7 @@ export class BinanceMockServer {
         contingencyType: 'OCO',
         listStatusType: 'EXEC_STARTED',
         listOrderStatus: 'EXECUTING',
+        stopLimitPrice: stopLimitPrice || '0', // Include stopLimitPrice in response
         listClientOrderId: listClientOrderId || `oco_${orderListId}`,
         transactionTime: Date.now(),
         symbol,

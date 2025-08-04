@@ -174,7 +174,7 @@ export class ErrorHandler {
 
   public async handleAsyncError<T>(
     operation: () => Promise<T>,
-    context?: any
+    context?: Record<string, unknown>
   ): Promise<T> {
     try {
       return await operation();
@@ -185,7 +185,7 @@ export class ErrorHandler {
 
   public handleSyncError<T>(
     operation: () => T,
-    context?: any
+    context?: Record<string, unknown>
   ): T {
     try {
       return operation();
@@ -211,7 +211,7 @@ export const setupGlobalErrorHandlers = (): void => {
   });
 
   // Handle unhandled promise rejections
-  process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
+  process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
     logger.fatal({ reason, promise }, 'Unhandled Promise Rejection');
     
     const error = reason instanceof Error ? reason : new Error(String(reason));

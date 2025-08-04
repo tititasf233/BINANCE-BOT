@@ -430,7 +430,7 @@ describe('Load Testing Integration Tests', () => {
                   .expect(200)
               );
               break;
-            case 3:
+            case 3: {
               // Activate/deactivate strategy
               const action = op % 2 === 0 ? 'activate' : 'deactivate';
               operations.push(
@@ -440,6 +440,7 @@ describe('Load Testing Integration Tests', () => {
                   .expect(200)
               );
               break;
+            }
           }
         }
         

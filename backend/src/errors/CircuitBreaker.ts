@@ -136,7 +136,7 @@ export class CircuitBreaker {
     }
   }
 
-  private onFailure(error: any, duration: number): void {
+  private onFailure(error: Error | unknown, duration: number): void {
     this.failureCount++;
     this.lastFailureTime = new Date();
 
@@ -292,10 +292,10 @@ export class CircuitBreakerManager {
 
 // Decorator for automatic circuit breaker
 export function withCircuitBreaker(name: string, config?: Partial<CircuitBreakerConfig>) {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+  return function (target: object, propertyName: string, descriptor: PropertyDescriptor) {
     const method = descriptor.value;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const manager = CircuitBreakerManager.getInstance();
       const circuitBreaker = manager.getOrCreate(name, config);
       

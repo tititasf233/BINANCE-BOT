@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import Redis from 'ioredis';
-import { DatabaseConnection } from '../../database/connection';
-import { RedisService } from '../../services/RedisService';
+// import { DatabaseConnection } from '../../database/connection'; // Not used directly
+// import { RedisService } from '../../services/RedisService'; // Not used directly
 import { logger } from '../../utils/logger';
 
 export class IntegrationTestSetup {

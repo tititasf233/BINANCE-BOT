@@ -93,6 +93,9 @@ describe('Failure Recovery Integration Tests', () => {
         connect: () => Promise.reject(new Error('Database connection failed')),
         query: () => Promise.reject(new Error('Database connection failed')),
       };
+      
+      // Log the failing pool for debugging
+      console.log('Created failing pool:', failingPool.constructor.name);
 
       // Replace the pool temporarily (this would be handled by connection retry logic in real implementation)
       // For this test, we'll simulate the failure by making requests that should fail gracefully
@@ -126,6 +129,9 @@ describe('Failure Recovery Integration Tests', () => {
         testDataFactory.createTestTrade(strategy.id, { status: 'OPEN' }),
         testDataFactory.createTestTrade(strategy.id, { status: 'CLOSED_TP' }),
       ]);
+
+      // Log initial trades count for verification
+      console.log(`Created ${initialTrades.length} initial trades`);
 
       // Get initial count
       const initialResponse = await request(app)

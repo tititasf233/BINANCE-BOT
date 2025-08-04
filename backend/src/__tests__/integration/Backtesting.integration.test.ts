@@ -3,7 +3,7 @@ import { app } from '../../app';
 import { IntegrationTestSetup, cleanupBetweenTests } from './setup';
 import { TestDataFactory } from './helpers/TestDataFactory';
 import { BinanceMockServer } from './helpers/BinanceMockServer';
-import { BacktestingService } from '../../services/BacktestingService';
+// import { BacktestingService } from '../../services/BacktestingService'; // Not used in HTTP tests
 import jwt from 'jsonwebtoken';
 
 describe('Backtesting Integration Tests', () => {

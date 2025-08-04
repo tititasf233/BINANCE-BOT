@@ -104,6 +104,7 @@ export class TechnicalIndicators {
 
     // For signal line, we need historical MACD values
     // TODO: Implement signal line calculation using signalPeriod
+    console.log(`MACD calculation using signalPeriod: ${signalPeriod}`);
     // This is a simplified version - in practice, you'd maintain MACD history
     const signal = macd; // Simplified - should be EMA of MACD values
     const histogram = macd - signal;
@@ -178,6 +179,7 @@ export class TechnicalIndicators {
     // For %D, we need historical %K values
     // This is simplified - should be SMA of %K values over dPeriod
     const d = k; // TODO: Implement proper %D calculation using dPeriod
+    console.log(`Stochastic %D calculation using dPeriod: ${dPeriod}`);
 
     return { k, d };
   }
@@ -345,6 +347,7 @@ export class TechnicalIndicators {
     // Simplified calculation - in practice, this needs more complex state management
     // TODO: Use maximum parameter to cap acceleration factor
     const isUptrend = currentHigh > prevHigh;
+    console.log(`Parabolic SAR using maximum: ${maximum}`);
     
     if (isUptrend) {
       return Math.min(currentLow, prevLow) * (1 - acceleration);

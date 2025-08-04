@@ -3,8 +3,8 @@ import { app } from '../../app';
 import { IntegrationTestSetup, cleanupBetweenTests } from './setup';
 import { TestDataFactory } from './helpers/TestDataFactory';
 import { BinanceMockServer } from './helpers/BinanceMockServer';
-import { DataIngestorService } from '../../services/DataIngestorService';
-import { StrategyEngineService } from '../../services/StrategyEngineService';
+// import { DataIngestorService } from '../../services/DataIngestorService'; // Not used directly
+// import { StrategyEngineService } from '../../services/StrategyEngineService'; // Not used directly
 import { ExecutionEngineService } from '../../services/ExecutionEngineService';
 import { MessageBrokerService } from '../../services/MessageBrokerService';
 import jwt from 'jsonwebtoken';

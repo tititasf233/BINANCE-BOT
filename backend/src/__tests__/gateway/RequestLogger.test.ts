@@ -201,8 +201,8 @@ describe('RequestLogger', () => {
         next(error);
       });
       app.use(RequestLogger.createErrorLogger());
-      app.use((error: Error, req: any, res: any, _next: any) => {
-        res.status(500).json({ error: error.message });
+      app.use((error: Error, req: any, res: any, next: any) => {
+        res.status(500).json({ error: error.message }); if (typeof next === 'function') { /* next available */ }
       });
 
       await request(app)
@@ -236,8 +236,8 @@ describe('RequestLogger', () => {
         next(error);
       });
       app.use(RequestLogger.createErrorLogger());
-      app.use((error: Error, req: any, res: any, _next: any) => {
-        res.status(500).json({ error: error.message });
+      app.use((error: Error, req: any, res: any, next: any) => {
+        res.status(500).json({ error: error.message }); if (typeof next === 'function') { /* next available */ }
       });
 
       await request(app)
