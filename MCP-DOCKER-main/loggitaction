@@ -1,0 +1,46 @@
+2025-08-04T00:01:34.2640390Z Current runner version: '2.327.1'
+2025-08-04T00:01:34.2736066Z ##[group]Runner Image Provisioner
+2025-08-04T00:01:34.2737205Z Hosted Compute Agent
+2025-08-04T00:01:34.2737931Z Version: 20250711.363
+2025-08-04T00:01:34.2738837Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-04T00:01:34.2740024Z Build Date: 2025-07-11T20:04:25Z
+2025-08-04T00:01:34.2740963Z ##[endgroup]
+2025-08-04T00:01:34.2741801Z ##[group]Operating System
+2025-08-04T00:01:34.2742600Z Ubuntu
+2025-08-04T00:01:34.2743401Z 24.04.2
+2025-08-04T00:01:34.2744158Z LTS
+2025-08-04T00:01:34.2744903Z ##[endgroup]
+2025-08-04T00:01:34.2745556Z ##[group]Runner Image
+2025-08-04T00:01:34.2746341Z Image: ubuntu-24.04
+2025-08-04T00:01:34.2747104Z Version: 20250728.1.0
+2025-08-04T00:01:34.2748643Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250728.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-04T00:01:34.2751128Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250728.1
+2025-08-04T00:01:34.2752621Z ##[endgroup]
+2025-08-04T00:01:34.2774685Z ##[group]GITHUB_TOKEN Permissions
+2025-08-04T00:01:34.2777422Z Contents: read
+2025-08-04T00:01:34.2778491Z Metadata: read
+2025-08-04T00:01:34.2779299Z Packages: read
+2025-08-04T00:01:34.2780153Z ##[endgroup]
+2025-08-04T00:01:34.2783353Z Secret source: Actions
+2025-08-04T00:01:34.2785065Z Prepare workflow directory
+2025-08-04T00:01:34.3682285Z Prepare all required actions
+2025-08-04T00:01:34.3801466Z Getting action download info
+2025-08-04T00:01:34.8154386Z ##[group]Download immutable action package 'docker/login-action@v3'
+2025-08-04T00:01:34.8155984Z Version: 3.4.0
+2025-08-04T00:01:34.8157045Z Digest: sha256:864ebd28db095e1602e6ef999f46a4f575083ea874918fbccf0994c2a7680450
+2025-08-04T00:01:34.8158224Z Source commit SHA: 74a5d142397b4f367a81961eba4e8cd7edddf772
+2025-08-04T00:01:34.8158997Z ##[endgroup]
+2025-08-04T00:01:35.2194743Z Complete job name: login
+2025-08-04T00:01:35.2970279Z ##[group]Run docker/login-action@v3
+2025-08-04T00:01:35.2971123Z with:
+2025-08-04T00:01:35.2971537Z   ecr: auto
+2025-08-04T00:01:35.2972104Z   logout: true
+2025-08-04T00:01:35.2973148Z ##[endgroup]
+2025-08-04T00:01:35.6012051Z ##[error]Username and password required
+2025-08-04T00:01:35.6168175Z Post job cleanup.
+2025-08-04T00:01:35.9271038Z [command]/usr/bin/docker logout 
+2025-08-04T00:01:37.0305951Z Removing login credentials for https://index.docker.io/v1/
+2025-08-04T00:01:37.0342671Z ##[group]Post cache
+2025-08-04T00:01:37.0344230Z State not set
+2025-08-04T00:01:37.0346127Z ##[endgroup]
+2025-08-04T00:01:37.0468905Z Cleaning up orphan processes

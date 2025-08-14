@@ -6,7 +6,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm config set fetch-retry-maxtimeout 600000 \
+  && npm config set fetch-timeout 600000 \
+  && npm config set registry https://registry.npmjs.org/ \
+  && npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .

@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "puppeteer": {
+      "command": "uvx",
+      "args": ["mcp-server-puppeteer"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": ["puppeteer_screenshot", "puppeteer_navigate", "puppeteer_click", "puppeteer_type"]
+    },
+    "browser-automation": {
+      "command": "uvx", 
+      "args": ["browser-automation-mcp"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": ["open_browser", "navigate", "click", "type", "screenshot"]
+    }
+  }
+}

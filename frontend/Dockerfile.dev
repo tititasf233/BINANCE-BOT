@@ -1,0 +1,24 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Instalar dependências do sistema necessárias para desenvolvimento
+RUN apk add --no-cache \
+    curl \
+    git \
+    && rm -rf /var/cache/apk/*
+
+# Copiar apenas package.json e package-lock.json primeiro
+COPY package*.json ./
+
+# Instalar dependências (incluindo dev dependencies)
+RUN npm ci
+
+# Criar diretório para cache
+RUN mkdir -p /app/.cache
+
+# Expor porta
+EXPOSE 3000
+
+# Comando para desenvolvimento com hot reload
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"] 

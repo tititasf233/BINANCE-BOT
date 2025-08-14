@@ -1,0 +1,76 @@
+{
+  "timestamp": "2025-08-08T06:19:17.488Z",
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "critical": 3
+  },
+  "tests": [
+    {
+      "name": "Teste de Realidade das Ordens Demo",
+      "success": true,
+      "duration": 19749,
+      "issueCount": 5,
+      "criticalIssues": 3
+    },
+    {
+      "name": "Teste de Operações Reais do Frontend",
+      "success": true,
+      "duration": 13726,
+      "issueCount": 1,
+      "criticalIssues": 0
+    },
+    {
+      "name": "Debug Profundo do Frontend",
+      "success": true,
+      "duration": 3273,
+      "issueCount": 0,
+      "criticalIssues": 0
+    }
+  ],
+  "criticalIssues": [
+    {
+      "type": "critical",
+      "message": "[2025-08-08T06:18:40.006Z] ❌ Ordens restantes após limpeza: 2",
+      "source": "output"
+    },
+    {
+      "type": "critical",
+      "message": "[2025-08-08T06:18:54.402Z] ❌ Limpeza Inicial: FALHOU",
+      "source": "output"
+    },
+    {
+      "type": "critical",
+      "message": "[2025-08-08T06:18:54.402Z] 🚨 ❌ PROBLEMAS CRÍTICOS ENCONTRADOS:",
+      "source": "output"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "frontend",
+      "title": "Backend funcionando - problema no frontend",
+      "description": "Todos os testes de backend passaram. O problema está no frontend (cache, refresh, etc.)",
+      "actions": [
+        "Implementar refresh mais agressivo após operações",
+        "Verificar logs do console do navegador",
+        "Reduzir intervalo de refresh para 3-5 segundos",
+        "Adicionar feedback visual imediato"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "monitoring",
+      "title": "Implementar monitoramento contínuo",
+      "description": "Adicionar monitoramento para detectar problemas automaticamente",
+      "actions": [
+        "Implementar health checks automáticos",
+        "Adicionar métricas de performance",
+        "Configurar alertas para falhas críticas",
+        "Implementar logs estruturados"
+      ]
+    }
+  ],
+  "logFile": "debug-report-2025-08-08T06-18-34-618Z.log"
+}

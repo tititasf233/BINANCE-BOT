@@ -9,8 +9,7 @@ services:
       POSTGRES_DB: aura_db
       POSTGRES_USER: aura_user
       POSTGRES_PASSWORD: aura_password
-    ports:
-      - "5432:5432"
+    # Removido bind da porta para evitar conflito local
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -21,8 +20,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: aura-redis
-    ports:
-      - "6379:6379"
+    # Removido bind da porta para evitar conflito local
     volumes:
       - redis_data:/data
     networks:
@@ -41,8 +39,14 @@ services:
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       BINANCE_API_URL: https://api.binance.com
       BINANCE_WS_URL: wss://stream.binance.com:9443
+      BINANCE_API_KEY: ${BINANCE_API_KEY}
+      BINANCE_SECRET_KEY: ${BINANCE_SECRET_KEY}
+      BINANCE_BASE_URL: ${BINANCE_BASE_URL}
+      BINANCE_TESTNET_URL: ${BINANCE_TESTNET_URL}
+      BINANCE_USE_TESTNET: ${BINANCE_USE_TESTNET}
+      DEMO_USE_LOCAL_MOCK: ${DEMO_USE_LOCAL_MOCK}
     ports:
-      - "3001:3001"
+      - "3001:8000"
     depends_on:
       - postgres
       - redis

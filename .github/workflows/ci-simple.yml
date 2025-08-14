@@ -59,6 +59,7 @@ jobs:
     needs: lint-check
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
+    timeout-minutes: 20
     
     permissions:
       contents: read

@@ -1,0 +1,28 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Instalar dependências do sistema necessárias para desenvolvimento
+RUN apk add --no-cache \
+    curl \
+    git \
+    && rm -rf /var/cache/apk/*
+
+# Copiar apenas package.json e package-lock.json primeiro
+COPY package*.json ./
+
+# Instalar dependências (incluindo dev dependencies)
+RUN npm ci
+
+# Criar diretórios necessários para logs
+RUN mkdir -p /app/logs
+
+# Expor porta
+EXPOSE 3001
+
+# Health check para desenvolvimento
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3001/health || exit 1
+
+# Comando para desenvolvimento com nodemon
+CMD ["npm", "run", "dev"] 

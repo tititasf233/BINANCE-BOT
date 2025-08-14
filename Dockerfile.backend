@@ -10,8 +10,8 @@ WORKDIR /app
 # Copiar arquivos de dependências
 COPY backend/package*.json ./
 
-# Instalar dependências
-RUN npm ci --only=production && npm cache clean --force
+# Instalar dependências (otimizado)
+RUN npm ci --prefer-offline --no-audit --progress=false && npm cache clean --force
 
 # Copiar código fonte
 COPY backend/ ./

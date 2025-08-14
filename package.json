@@ -18,7 +18,13 @@
     "lint:frontend": "cd frontend && npm run lint",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:build": "docker-compose build"
+    "docker:build": "docker-compose build",
+    "docker:dev:start": "./scripts/dev-docker.sh start",
+    "docker:dev:stop": "./scripts/dev-docker.sh stop",
+    "docker:dev:restart": "./scripts/dev-docker.sh restart",
+    "docker:dev:logs": "./scripts/dev-docker.sh logs",
+    "docker:dev:status": "./scripts/dev-docker.sh status",
+    "docker:dev:exec": "./scripts/dev-docker.sh exec"
   },
   "keywords": [
     "trading",
@@ -31,5 +37,10 @@
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.1",
+    "pg": "^8.16.3"
   }
 }

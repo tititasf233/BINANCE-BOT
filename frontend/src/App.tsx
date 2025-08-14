@@ -8,11 +8,14 @@ import { Layout } from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import './services/api/interceptors'; // Initialize interceptors
+import { enableGlobalUiInstrumentation } from './services/ui/uiLogger';
 
 import { DashboardPage } from './components/dashboard/DashboardPage';
 import { StrategiesPage } from './components/strategies/StrategiesPage';
 import { BacktestPage } from './components/backtest/BacktestPage';
 import { HistoryPage } from './components/history/HistoryPage';
+import Dashboard from './components/Dashboard';
+import Login from './components/Login';
 
 // Placeholder components for routes
 const Portfolio = () => <div>Portfolio Page</div>;
@@ -24,6 +27,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     dispatch(checkAuthStatus() as any);
+    enableGlobalUiInstrumentation();
   }, [dispatch]);
 
   if (isLoading) {

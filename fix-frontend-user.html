@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Frontend User - AURA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .danger {
+            background: #f44336;
+        }
+        .danger:hover {
+            background: #da190b;
+        }
+        .info {
+            background: #2196F3;
+        }
+        .info:hover {
+            background: #0b7dda;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .success {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        .error {
+            background: rgba(244, 67, 54, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 AURA - Fix Frontend User</h1>
+        <p>Esta página ajuda a corrigir problemas de usuário no frontend do AURA.</p>
+        
+        <div id="status" class="status">
+            <strong>Status:</strong> Verificando...
+        </div>
+        
+        <h3>Ações Disponíveis:</h3>
+        
+        <button onclick="clearStorage()" class="danger">
+            🗑️ Limpar Cache do Navegador
+        </button>
+        
+        <button onclick="loginCorrectUser()" class="info">
+            🔐 Login com Usuário Correto
+        </button>
+        
+        <button onclick="checkStatus()" class="info">
+            ✅ Verificar Status
+        </button>
+        
+        <button onclick="goToApp()">
+            🚀 Ir para AURA App
+        </button>
+        
+        <div id="result" class="status" style="display: none;">
+            <div id="resultContent"></div>
+        </div>
+        
+        <h3>Informações:</h3>
+        <ul>
+            <li><strong>Email correto:</strong> test@example.com</li>
+            <li><strong>Senha:</strong> password123</li>
+            <li><strong>Este usuário tem as API keys da Binance configuradas</strong></li>
+        </ul>
+    </div>
+
+    <script>
+        function showResult(message, isSuccess = true) {
+            const result = document.getElementById('result');
+            const content = document.getElementById('resultContent');
+            content.innerHTML = message;
+            result.className = `status ${isSuccess ? 'success' : 'error'}`;
+            result.style.display = 'block';
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = `<strong>Status:</strong> ${message}`;
+        }
+        
+        function clearStorage() {
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                showResult('✅ Cache limpo com sucesso! Agora faça login novamente.');
+                updateStatus('Cache limpo - Pronto para novo login');
+            } catch (error) {
+                showResult('❌ Erro ao limpar cache: ' + error.message, false);
+            }
+        }
+        
+        async function loginCorrectUser() {
+            try {
+                updateStatus('Fazendo login...');
+                
+                const response = await fetch('http://localhost:3001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('aura_token', data.data.token);
+                    localStorage.setItem('aura_user', JSON.stringify(data.data.user));
+                    
+                    showResult('✅ Login realizado com sucesso! Usuário: ' + data.data.user.email);
+                    updateStatus('Logado como: ' + data.data.user.email);
+                } else {
+                    showResult('❌ Erro no login: ' + data.error, false);
+                    updateStatus('Erro no login');
+                }
+            } catch (error) {
+                showResult('❌ Erro de conexão: ' + error.message, false);
+                updateStatus('Erro de conexão');
+            }
+        }
+        
+        async function checkStatus() {
+            try {
+                const token = localStorage.getItem('aura_token');
+                const user = localStorage.getItem('aura_user');
+                
+                if (!token || !user) {
+                    showResult('❌ Nenhum usuário logado. Faça login primeiro.', false);
+                    updateStatus('Não logado');
+                    return;
+                }
+                
+                const userData = JSON.parse(user);
+                updateStatus('Verificando API keys...');
+                
+                // Test API endpoints
+                const response = await fetch('http://localhost:3001/api/trading/mode', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Tudo funcionando!<br>
+                        Usuário: ${userData.email}<br>
+                        Modo: ${data.data.mode}<br>
+                        API Keys: Configuradas`);
+                    updateStatus('Tudo funcionando - ' + userData.email);
+                } else {
+                    const errorData = await response.json();
+                    showResult(`❌ Problema com API keys: ${errorData.error}<br>
+                        Usuário atual: ${userData.email}<br>
+                        Use o usuário: test@example.com`, false);
+                    updateStatus('Problema com API keys');
+                }
+            } catch (error) {
+                showResult('❌ Erro ao verificar status: ' + error.message, false);
+                updateStatus('Erro na verificação');
+            }
+        }
+        
+        function goToApp() {
+            window.open('http://localhost:3000', '_blank');
+        }
+        
+        // Check status on load
+        window.onload = function() {
+            checkStatus();
+        };
+    </script>
+</body>
+</html>

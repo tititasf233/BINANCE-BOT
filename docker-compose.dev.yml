@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: aura-postgres-dev
+    environment:
+      POSTGRES_DB: aura_db
+      POSTGRES_USER: aura_user
+      POSTGRES_PASSWORD: aura_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - aura-network-dev
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: aura-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aura-network-dev
+
+  # Backend API - Development Mode
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: aura-backend-dev
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://aura_user:aura_password@postgres:5432/aura_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      BINANCE_API_URL: https://api.binance.com
+      BINANCE_WS_URL: wss://stream.binance.com:9443
+      # Configurações para desenvolvimento dinâmico
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      # Bind mount completo para desenvolvimento dinâmico
+      - ./backend:/app
+      # Volume anônimo para node_modules (evita conflitos)
+      - /app/node_modules
+      # Volume para logs de desenvolvimento
+      - backend_logs:/app/logs
+    networks:
+      - aura-network-dev
+    # Configurações para desenvolvimento
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  # Frontend React App - Development Mode
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: aura-frontend-dev
+    environment:
+      REACT_APP_API_URL: http://localhost:3001/api/v1
+      REACT_APP_WS_URL: ws://localhost:3001
+      # Configurações para desenvolvimento dinâmico
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      FAST_REFRESH: "true"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      # Bind mount completo para desenvolvimento dinâmico
+      - ./frontend:/app
+      # Volume anônimo para node_modules (evita conflitos)
+      - /app/node_modules
+      # Volume para cache do React
+      - frontend_cache:/app/.cache
+    networks:
+      - aura-network-dev
+    # Configurações para desenvolvimento
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  backend_logs:
+  frontend_cache:
+
+networks:
+  aura-network-dev:
+    driver: bridge 

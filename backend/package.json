@@ -4,7 +4,7 @@
   "description": "Backend do Sistema AURA - API Gateway e Microserviços",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon --exec \"ts-node --transpile-only src/test-server.ts\"",
+    "dev": "nodemon --exec \"ts-node --transpile-only -r tsconfig-paths/register src/simple-server.ts\"",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest",
@@ -36,7 +36,6 @@
     "node-cron": "^3.0.3",
     "pg": "^8.11.3",
     "redis": "^4.6.10",
-    "tsconfig-paths": "^4.2.0",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "ws": "^8.14.2"
@@ -63,7 +62,8 @@
     "prettier": "^3.1.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
   }
 }

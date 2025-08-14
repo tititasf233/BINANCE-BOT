@@ -19,14 +19,14 @@ class DatabaseConnection {
 
   constructor() {
     this.config = {
-      host: process.env.DB_HOST || 'localhost',
+      host: process.env.DB_HOST || 'postgres',
       port: parseInt(process.env.DB_PORT || '5432'),
       database: process.env.DB_NAME || 'aura_db',
       user: process.env.DB_USER || 'aura_user',
       password: process.env.DB_PASSWORD || 'aura_password',
       max: 20, // Maximum number of clients in the pool
       idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-      connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
+      connectionTimeoutMillis: 10000, // Return an error after 10 seconds if connection could not be established
     };
 
     this.pool = new Pool(this.config);
